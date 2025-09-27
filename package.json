@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"nodemon --watch server --ext ts --exec ts-node server/server.ts\" \"vite\"",
-    "esm-dev": "concurrently \"vite\" \"tsx watch server/server.ts\"",
+    "esm-dev": "concurrently \"vite\" \"nodemon --watch server --ext ts --exec tsx server/server.ts\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

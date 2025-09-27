@@ -6,15 +6,19 @@ import { fileURLToPath } from 'url';
 
 import songsRoutes from './routes/songsRoutes.js';
 
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors());
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 
 app.use('/songs', songsRoutes);
 
@@ -51,7 +55,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`Server listening on port: ${PORT}`);
 });
 
 export default app;
