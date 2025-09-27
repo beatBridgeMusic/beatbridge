@@ -263,19 +263,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
         )}
       </div>
 
-      {/* Selection Status */}
-      <div className="selection-status">
-        {selectedSongs.length < MIN_SONG_SELECTION && (
-          <p className="warning">
-            Select at least {MIN_SONG_SELECTION} songs to create a playlist
-          </p>
-        )}
-        {selectedSongs.length >= MIN_SONG_SELECTION && (
-          <p className="success">
-            Ready to order! {selectedSongs.length} songs selected
-          </p>
-        )}
-      </div>
+      {/* Selection-Status removed due to redundancy - Jamila */}
     </div>
   );
 };
