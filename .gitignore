@@ -23,6 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
+.git
+
 # added by Jamila ****-------------------------------****
 # Environment variables (important for Supabase keys)
 .env
