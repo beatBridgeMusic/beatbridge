@@ -1,0 +1,34 @@
+.
+├── README.md
+├── eslint.config.js
+├── file-structure.txt
+├── index.html
+├── package-lock.json
+├── package.json
+├── public
+│   └── vite.svg
+├── server
+│   └── server.ts
+├── src
+│   ├── App.css
+│   ├── App.tsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── features
+│   │   ├── moods
+│   │   │   ├── components
+│   │   │   │   ├── MoodSelector.tsx
+│   │   │   │   ├── MoodType.tsx
+│   │   │   │   └── UserMoodInput.tsx
+│   │   │   ├── constants.ts
+│   │   │   └── types.ts
+│   │   └── playlists
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+9 directories, 23 files
