@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import { parse } from 'csv-parse';
 import { Client } from 'pg';
 
+// run <node scripts/upsert_csv_to_postgres.js scripts/[file_to_be_uploaded].csv> in the root directory to process the CSV
+// make sure the format of the DATABASE_URL in .env is: DATABASE_URL=postgresql://postgres:....supabase.co:5432/postgres?sslmode=require
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
