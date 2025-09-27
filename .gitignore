@@ -22,4 +22,26 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# added by Jamila ****-------------------------------****
+# Environment variables (important for Supabase keys)
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Supabase local development
+.supabase/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Coverage reports (if you add testing later)
+coverage/
+
+# Optional: OS files (you have .DS_Store already, but these cover more)
+Thumbs.db
+ehthumbs.db
+.Trashes
+# End of added by Jamila ****-------------------------------****
