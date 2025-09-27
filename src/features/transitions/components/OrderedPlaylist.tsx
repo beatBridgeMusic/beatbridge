@@ -92,7 +92,7 @@ export const OrderedPlaylist: React.FC<OrderedPlaylistProps> = ({
       <div className="ordered-playlist empty">
         <div className="empty-state">
           <h3>Your Beat Bridge Will Appear Here</h3>
-          <p>Select songs, choose a metric, and create your perfectly ordered playlist!</p>
+          {/* removed redundant tagline */}
         </div>
       </div>
     );

@@ -152,7 +152,7 @@ export const TransitionLab: React.FC = () => {
       {/* Header */}
       <header className='lab-header'>
         <h1>🎵 BeatBridge</h1>
-        <p>Order your songs by any metric for the perfect flow</p>
+        <p>Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
       <div className='lab-content'>
@@ -170,7 +170,7 @@ export const TransitionLab: React.FC = () => {
           {/* Step 2: Metric Selection */}
           {selectedSongs.length >= MIN_SONG_SELECTION && (
             <div className='config-step'>
-              <div className='step-number'>Step 2</div>
+              <div className='step-number'>Step 2:</div>
               <MetricSelector
                 selectedMetric={selectedMetric}
                 onMetricChange={setSelectedMetric}
@@ -183,7 +183,7 @@ export const TransitionLab: React.FC = () => {
           {/* Step 3: Duration (Optional) */}
           {selectedMetric && (
             <div className='config-step'>
-              <div className='step-number'>3</div>
+              <div className='step-number'>Step 3:</div>
               <DurationInput
                 selectedSongs={selectedSongs}
                 customDuration={customDuration}
@@ -207,7 +207,7 @@ export const TransitionLab: React.FC = () => {
 
               <div className='generation-preview'>
                 <p>
-                  Ready to order Jamila, Will, Sd{selectedSongs.length} songs by{' '}
+                  Ready to order {selectedSongs.length} songs by{' '}
                   <strong>{selectedMetric}</strong> (
                   {orderDirection === 'asc' ? 'ascending' : 'descending'})
                   {customDuration && ` for ${customDuration} minutes`}
