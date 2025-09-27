@@ -207,7 +207,7 @@ export const TransitionLab: React.FC = () => {
 
               <div className='generation-preview'>
                 <p>
-                  Ready to order Jamila, Will, Sd{selectedSongs.length} songs by{' '}
+                  Ready to order {selectedSongs.length} songs by{' '}
                   <strong>{selectedMetric}</strong> (
                   {orderDirection === 'asc' ? 'ascending' : 'descending'})
                   {customDuration && ` for ${customDuration} minutes`}

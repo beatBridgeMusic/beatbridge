@@ -8,10 +8,7 @@ interface SongSelectorProps {
   onSongsChange: (songs: DbSong[]) => void;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({
-  selectedSongs,
-  onSongsChange
-}) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
@@ -24,27 +21,32 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
       setIsLoading(true);
       try {
         // TODO: Replace with actual API call
-        // const response = await fetch('/api/transitions/songs/search');
-        // const data = await response.json();
-        
+        const response = await fetch('http://localhost:3001/songs/all');
+        if (!response.ok) {
+          throw new Error(`Error fetching all songs, server returned ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('data in song selector', data);
+        console.log('type of data', typeof data);
+
         // Mock data for now
         const mockSongs: DbSong[] = [
           {
-            id: "1",
-            track_uri: "spotify:track:1",
-            track_name: "Blinding Lights",
-            album_name: "After Hours",
-            artist_name_s: "The Weeknd",
-            release_date: "2019-11-29",
+            id: '1',
+            track_uri: 'spotify:track:1',
+            track_name: 'Blinding Lights',
+            album_name: 'After Hours',
+            artist_name_s: 'The Weeknd',
+            release_date: '2019-11-29',
             duration_ms: 200040,
             popularity: 95,
             explicit: false,
-            added_by: "system",
-            added_at: "2024-01-01T00:00:00Z",
-            genres: "pop",
-            record_label: "XO/Republic",
+            added_by: 'system',
+            added_at: '2024-01-01T00:00:00Z',
+            genres: 'pop',
+            record_label: 'XO/Republic',
             danceability: 0.514,
-            energy: 0.730,
+            energy: 0.73,
             key: 1,
             loudness: -5.934,
             mode: 1,
@@ -55,22 +57,22 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             valence: 0.334,
             tempo: 171.005,
             time_signature: 4,
-            row_hash: "hash1"
+            row_hash: 'hash1',
           },
           {
-            id: "2",
-            track_uri: "spotify:track:2",
-            track_name: "Good 4 U",
-            album_name: "SOUR",
-            artist_name_s: "Olivia Rodrigo",
-            release_date: "2021-05-14",
+            id: '2',
+            track_uri: 'spotify:track:2',
+            track_name: 'Good 4 U',
+            album_name: 'SOUR',
+            artist_name_s: 'Olivia Rodrigo',
+            release_date: '2021-05-14',
             duration_ms: 178147,
             popularity: 88,
             explicit: false,
-            added_by: "system",
-            added_at: "2024-01-01T00:00:00Z",
-            genres: "pop rock",
-            record_label: "Geffen Records",
+            added_by: 'system',
+            added_at: '2024-01-01T00:00:00Z',
+            genres: 'pop rock',
+            record_label: 'Geffen Records',
             danceability: 0.563,
             energy: 0.664,
             key: 9,
@@ -78,27 +80,27 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             mode: 1,
             speechiness: 0.154,
             acousticness: 0.105,
-            instrumentalness: 0.000000,
+            instrumentalness: 0.0,
             liveness: 0.0849,
             valence: 0.688,
             tempo: 178.086,
             time_signature: 4,
-            row_hash: "hash2"
+            row_hash: 'hash2',
           },
           {
-            id: "3",
-            track_uri: "spotify:track:3",
-            track_name: "Anti-Hero",
-            album_name: "Midnights",
-            artist_name_s: "Taylor Swift",
-            release_date: "2022-10-21",
+            id: '3',
+            track_uri: 'spotify:track:3',
+            track_name: 'Anti-Hero',
+            album_name: 'Midnights',
+            artist_name_s: 'Taylor Swift',
+            release_date: '2022-10-21',
             duration_ms: 200690,
             popularity: 92,
             explicit: false,
-            added_by: "system",
-            added_at: "2024-01-01T00:00:00Z",
-            genres: "pop",
-            record_label: "Republic Records",
+            added_by: 'system',
+            added_at: '2024-01-01T00:00:00Z',
+            genres: 'pop',
+            record_label: 'Republic Records',
             danceability: 0.571,
             energy: 0.681,
             key: 6,
@@ -109,13 +111,13 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             instrumentalness: 0.000003,
             liveness: 0.124,
             valence: 0.571,
-            tempo: 96.950,
+            tempo: 96.95,
             time_signature: 4,
-            row_hash: "hash3"
-          }
+            row_hash: 'hash3',
+          },
         ];
-        
-        setAvailableSongs(mockSongs);
+
+        setAvailableSongs(data);
       } catch (error) {
         console.error('Failed to fetch songs:', error);
       } finally {
@@ -128,9 +130,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
   // Filter and sort songs
   const filteredAndSortedSongs = availableSongs
-    .filter(song => 
-      song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      song.artist_name_s.toLowerCase().includes(searchFilter.toLowerCase())
+    .filter(
+      (song) =>
+        song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+        song.artist_name_s.toLowerCase().includes(searchFilter.toLowerCase())
     )
     .sort((a, b) => {
       if (sortBy === 'artist') {
@@ -140,11 +143,11 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     });
 
   const handleSongToggle = (song: DbSong) => {
-    const isSelected = selectedSongs.some(s => s.id === song.id);
-    
+    const isSelected = selectedSongs.some((s) => s.id === song.id);
+
     if (isSelected) {
       // Remove song
-      onSongsChange(selectedSongs.filter(s => s.id !== song.id));
+      onSongsChange(selectedSongs.filter((s) => s.id !== song.id));
     } else {
       // Add song (if under limit)
       if (selectedSongs.length < MAX_SONG_SELECTION) {
@@ -154,7 +157,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
   };
 
   const handleRemoveSelectedSong = (songId: string) => {
-    onSongsChange(selectedSongs.filter(s => s.id !== songId));
+    onSongsChange(selectedSongs.filter((s) => s.id !== songId));
   };
 
   const formatDuration = (ms: number) => {
@@ -164,28 +167,29 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
   };
 
   if (isLoading) {
-    return <div className="song-selector loading">Loading songs...</div>;
+    return <div className='song-selector loading'>Loading songs...</div>;
   }
 
   return (
-    <div className="song-selector">
+    <div className='song-selector'>
       <h3>Choose Your Songs</h3>
-      <p>Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database</p>
-      
+      <p>
+        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database
+      </p>
+
       {/* Selected Songs Display */}
       {selectedSongs.length > 0 && (
-        <div className="selected-songs">
-          <h4>Selected Songs ({selectedSongs.length}/{MAX_SONG_SELECTION})</h4>
-          <div className="selected-songs-list">
-            {selectedSongs.map(song => (
-              <div key={song.id} className="selected-song-chip">
-                <span className="song-info">
+        <div className='selected-songs'>
+          <h4>
+            Selected Songs ({selectedSongs.length}/{MAX_SONG_SELECTION})
+          </h4>
+          <div className='selected-songs-list'>
+            {selectedSongs.map((song) => (
+              <div key={song.id} className='selected-song-chip'>
+                <span className='song-info'>
                   {song.track_name} - {song.artist_name_s}
                 </span>
-                <button 
-                  onClick={() => handleRemoveSelectedSong(song.id)}
-                  className="remove-song-btn"
-                >
+                <button onClick={() => handleRemoveSelectedSong(song.id)} className='remove-song-btn'>
                   ✕
                 </button>
               </div>
@@ -195,58 +199,55 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
       )}
 
       {/* Song Selection Dropdown */}
-      <div className="song-dropdown">
-        <button 
-          className="dropdown-toggle"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
+      <div className='song-dropdown'>
+        <button className='dropdown-toggle' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           Add Songs ({filteredAndSortedSongs.length} available)
           <span className={`arrow ${isDropdownOpen ? 'up' : 'down'}`}>▼</span>
         </button>
 
         {isDropdownOpen && (
-          <div className="dropdown-content">
+          <div className='dropdown-content'>
             {/* Search and Sort Controls */}
-            <div className="dropdown-controls">
+            <div className='dropdown-controls'>
               <input
-                type="text"
-                placeholder="Search songs or artists..."
+                type='text'
+                placeholder='Search songs or artists...'
                 value={searchFilter}
                 onChange={(e) => setSearchFilter(e.target.value)}
-                className="search-input"
+                className='search-input'
               />
-              <select 
-                value={sortBy} 
+              <select
+                value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
-                className="sort-select"
+                className='sort-select'
               >
-                <option value="artist">Sort by Artist</option>
-                <option value="title">Sort by Song Title</option>
+                <option value='artist'>Sort by Artist</option>
+                <option value='title'>Sort by Song Title</option>
               </select>
             </div>
 
             {/* Songs List */}
-            <div className="songs-list">
-              {filteredAndSortedSongs.map(song => {
-                const isSelected = selectedSongs.some(s => s.id === song.id);
+            <div className='songs-list'>
+              {filteredAndSortedSongs.map((song) => {
+                const isSelected = selectedSongs.some((s) => s.id === song.id);
                 const isDisabled = !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
-                
+
                 return (
-                  <div 
-                    key={song.id} 
+                  <div
+                    key={song.id}
                     className={`song-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
                   >
-                    <label className="song-checkbox">
+                    <label className='song-checkbox'>
                       <input
-                        type="checkbox"
+                        type='checkbox'
                         checked={isSelected}
                         onChange={() => handleSongToggle(song)}
                         disabled={isDisabled}
                       />
-                      <div className="song-details">
-                        <div className="song-title">{song.track_name}</div>
-                        <div className="song-artist">{song.artist_name_s}</div>
-                        <div className="song-meta">
+                      <div className='song-details'>
+                        <div className='song-title'>{song.track_name}</div>
+                        <div className='song-artist'>{song.artist_name_s}</div>
+                        <div className='song-meta'>
                           {formatDuration(song.duration_ms)} • {song.genres}
                         </div>
                       </div>
@@ -254,9 +255,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                   </div>
                 );
               })}
-              
+
               {filteredAndSortedSongs.length === 0 && (
-                <div className="no-results">No songs found matching your search</div>
+                <div className='no-results'>No songs found matching your search</div>
               )}
             </div>
           </div>
@@ -264,16 +265,12 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
       </div>
 
       {/* Selection Status */}
-      <div className="selection-status">
+      <div className='selection-status'>
         {selectedSongs.length < MIN_SONG_SELECTION && (
-          <p className="warning">
-            Select at least {MIN_SONG_SELECTION} songs to create a playlist
-          </p>
+          <p className='warning'>Select at least {MIN_SONG_SELECTION} songs to create a playlist</p>
         )}
         {selectedSongs.length >= MIN_SONG_SELECTION && (
-          <p className="success">
-            Ready to order! {selectedSongs.length} songs selected
-          </p>
+          <p className='success'>Ready to order! {selectedSongs.length} songs selected</p>
         )}
       </div>
     </div>

@@ -32,6 +32,7 @@ const SORTABLE_METRICS: SortableMetrics = {
 
 const songsController: SongsController = {
   async getSongs(req, res, next) {
+    console.log('get songs called')
     try {
       const { sort, dir } = req.query;
       const result = await db.query(`SELECT track_name FROM groovin ORDER BY ${sort} ${dir}`);
@@ -48,10 +49,11 @@ const songsController: SongsController = {
   },
 
   async getAllSongs(req, res, next) {
+    console.log('get all songs called')
     try {
       const result = await db.query('SELECT * FROM groovin');
       res.locals.songsList = result.rows;
-      console.log(res.locals.songsList);
+      // console.log(res.locals.songsList);
       return next();
     } catch (error) {
       return next({
@@ -63,6 +65,7 @@ const songsController: SongsController = {
   },
 
   async getAllTrackNames(req, res, next) {
+    console.log('get all track names called')
     try {
       const result = await db.query('SELECT track_names FROM groovin');
       res.locals.songsList = result.rows;
