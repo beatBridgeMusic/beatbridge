@@ -20,102 +20,12 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     const fetchSongs = async () => {
       setIsLoading(true);
       try {
-        // TODO: Replace with actual API call
+        // TODO: Replace with better API call? or maybe it's too much work to refactor the frontend
         const response = await fetch('http://localhost:3001/songs/all');
         if (!response.ok) {
           throw new Error(`Error fetching all songs, server returned ${response.status}`);
         }
         const data = await response.json();
-        console.log('data in song selector', data);
-        console.log('type of data', typeof data);
-
-        // Mock data for now
-        const mockSongs: DbSong[] = [
-          {
-            id: '1',
-            track_uri: 'spotify:track:1',
-            track_name: 'Blinding Lights',
-            album_name: 'After Hours',
-            artist_name_s: 'The Weeknd',
-            release_date: '2019-11-29',
-            duration_ms: 200040,
-            popularity: 95,
-            explicit: false,
-            added_by: 'system',
-            added_at: '2024-01-01T00:00:00Z',
-            genres: 'pop',
-            record_label: 'XO/Republic',
-            danceability: 0.514,
-            energy: 0.73,
-            key: 1,
-            loudness: -5.934,
-            mode: 1,
-            speechiness: 0.0598,
-            acousticness: 0.00146,
-            instrumentalness: 0.000002,
-            liveness: 0.0897,
-            valence: 0.334,
-            tempo: 171.005,
-            time_signature: 4,
-            row_hash: 'hash1',
-          },
-          {
-            id: '2',
-            track_uri: 'spotify:track:2',
-            track_name: 'Good 4 U',
-            album_name: 'SOUR',
-            artist_name_s: 'Olivia Rodrigo',
-            release_date: '2021-05-14',
-            duration_ms: 178147,
-            popularity: 88,
-            explicit: false,
-            added_by: 'system',
-            added_at: '2024-01-01T00:00:00Z',
-            genres: 'pop rock',
-            record_label: 'Geffen Records',
-            danceability: 0.563,
-            energy: 0.664,
-            key: 9,
-            loudness: -5.044,
-            mode: 1,
-            speechiness: 0.154,
-            acousticness: 0.105,
-            instrumentalness: 0.0,
-            liveness: 0.0849,
-            valence: 0.688,
-            tempo: 178.086,
-            time_signature: 4,
-            row_hash: 'hash2',
-          },
-          {
-            id: '3',
-            track_uri: 'spotify:track:3',
-            track_name: 'Anti-Hero',
-            album_name: 'Midnights',
-            artist_name_s: 'Taylor Swift',
-            release_date: '2022-10-21',
-            duration_ms: 200690,
-            popularity: 92,
-            explicit: false,
-            added_by: 'system',
-            added_at: '2024-01-01T00:00:00Z',
-            genres: 'pop',
-            record_label: 'Republic Records',
-            danceability: 0.571,
-            energy: 0.681,
-            key: 6,
-            loudness: -6.777,
-            mode: 1,
-            speechiness: 0.0544,
-            acousticness: 0.254,
-            instrumentalness: 0.000003,
-            liveness: 0.124,
-            valence: 0.571,
-            tempo: 96.95,
-            time_signature: 4,
-            row_hash: 'hash3',
-          },
-        ];
 
         setAvailableSongs(data);
       } catch (error) {
