@@ -73,6 +73,28 @@ const Login = () => {
             >
               Submit
             </button>
+            <div className='my-2 text-center text-white-500 text-sm'>OR</div>
+            <button
+              type='button'
+              className='w-full flex items-center justify-center gap-2 
+             bg-white text-gray-700 border border-gray-300 rounded-lg 
+             shadow-sm hover:shadow-md py-2 
+             transform transition duration-200 
+             hover:scale-105 active:scale-95'
+              onClick={() =>
+                (window.location.href =
+                  'http://localhost:3001/auth/login/google')
+              }
+            >
+              <img
+                src='https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg'
+                alt='Google'
+                className='w-5 h-5'
+              />
+              <span className='text-base font-medium '>
+                Sign in with Google
+              </span>
+            </button>
           </form>
           <div className='text-center my-3'>
             <span>Don't have an account?</span>
