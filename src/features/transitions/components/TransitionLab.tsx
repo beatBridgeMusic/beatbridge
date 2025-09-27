@@ -1,6 +1,10 @@
 // src/features/transitions/components/TransitionLab.tsx
 import React, { useState } from 'react';
-import type { DbSong, OrderingMetric, OrderedPlaylist as OrderedPlaylistType } from '../types';
+import type {
+  DbSong,
+  OrderingMetric,
+  OrderedPlaylist as OrderedPlaylistType,
+} from '../types';
 import { MIN_SONG_SELECTION } from '../constants';
 import { SongSelector } from './SongSelector.js';
 import { MetricSelector } from './MetricSelector.js';
@@ -10,20 +14,24 @@ import { OrderedPlaylist } from './OrderedPlaylist.js';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
-  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(
+    null
+  );
   const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('asc');
   const [customDuration, setCustomDuration] = useState<number | null>(null);
-  const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
+  const [orderedPlaylist, setOrderedPlaylist] =
+    useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Check if we can generate a playlist
-  const canGenerate = selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
+  const canGenerate =
+    selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
 
   const handleGeneratePlaylist = async () => {
     if (!canGenerate) return;
 
     setIsGenerating(true);
-    
+
     try {
       // TODO: Replace with actual API call
       // const response = await fetch('/api/transitions/order', {
@@ -39,12 +47,12 @@ export const TransitionLab: React.FC = () => {
       // const data = await response.json();
 
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Mock ordering logic (will be replaced by Will's backend)
       const orderedSongs = [...selectedSongs].sort((a, b) => {
         let aValue: number, bValue: number;
-        
+
         switch (selectedMetric) {
           case 'tempo':
             aValue = a.tempo;
@@ -73,7 +81,7 @@ export const TransitionLab: React.FC = () => {
           default:
             return 0;
         }
-        
+
         return orderDirection === 'asc' ? aValue - bValue : bValue - aValue;
       });
 
@@ -83,7 +91,7 @@ export const TransitionLab: React.FC = () => {
         const targetDurationMs = customDuration * 60000;
         let currentDuration = 0;
         finalSongs = [];
-        
+
         // Add songs until we reach target duration
         for (const song of orderedSongs) {
           if (currentDuration + song.duration_ms <= targetDurationMs) {
@@ -93,7 +101,7 @@ export const TransitionLab: React.FC = () => {
             break;
           }
         }
-        
+
         // If we haven't reached target duration, repeat songs
         if (currentDuration < targetDurationMs && orderedSongs.length > 0) {
           let songIndex = 0;
@@ -119,7 +127,7 @@ export const TransitionLab: React.FC = () => {
         songs: finalSongs,
         orderingMetric: selectedMetric,
         totalDuration,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
 
       setOrderedPlaylist(playlist);
@@ -140,21 +148,20 @@ export const TransitionLab: React.FC = () => {
   };
 
   return (
-    <div className="transition-lab">
+    <div className='transition-lab'>
       {/* Header */}
-      <header className="lab-header">
+      <header className='lab-header'>
         <h1>🎵 BeatBridge</h1>
         <p>Order your songs by any metric for the perfect flow</p>
       </header>
 
-      <div className="lab-content">
+      <div className='lab-content'>
         {/* Configuration Section */}
-        <div className="configuration-section">
-          
+        <div className='configuration-section'>
           {/* Step 1: Song Selection */}
-          <div className="config-step">
-            <div className="step-number">Step 1:</div>
-            <SongSelector 
+          <div className='config-step'>
+            <div className='step-number'>Step 1:</div>
+            <SongSelector
               selectedSongs={selectedSongs}
               onSongsChange={setSelectedSongs}
             />
@@ -162,9 +169,9 @@ export const TransitionLab: React.FC = () => {
 
           {/* Step 2: Metric Selection */}
           {selectedSongs.length >= MIN_SONG_SELECTION && (
-            <div className="config-step">
-              <div className="step-number">Step 2</div>
-              <MetricSelector 
+            <div className='config-step'>
+              <div className='step-number'>Step 2</div>
+              <MetricSelector
                 selectedMetric={selectedMetric}
                 onMetricChange={setSelectedMetric}
                 orderDirection={orderDirection}
@@ -175,9 +182,9 @@ export const TransitionLab: React.FC = () => {
 
           {/* Step 3: Duration (Optional) */}
           {selectedMetric && (
-            <div className="config-step">
-              <div className="step-number">3</div>
-              <DurationInput 
+            <div className='config-step'>
+              <div className='step-number'>3</div>
+              <DurationInput
                 selectedSongs={selectedSongs}
                 customDuration={customDuration}
                 onDurationChange={setCustomDuration}
@@ -187,20 +194,22 @@ export const TransitionLab: React.FC = () => {
 
           {/* Generate Button */}
           {canGenerate && (
-            <div className="generate-section">
-              <button 
+            <div className='generate-section'>
+              <button
                 onClick={handleGeneratePlaylist}
                 disabled={isGenerating}
-                className="generate-playlist-btn"
+                className='generate-playlist-btn'
               >
-                {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
+                {isGenerating
+                  ? 'Creating Your Beat Bridge...'
+                  : 'Create Beat Bridge'}
               </button>
-              
-              <div className="generation-preview">
+
+              <div className='generation-preview'>
                 <p>
-                  Ready to order {selectedSongs.length} songs by{' '}
-                  <strong>{selectedMetric}</strong>{' '}
-                  ({orderDirection === 'asc' ? 'ascending' : 'descending'})
+                  Ready to order Jamila, Will, Sd{selectedSongs.length} songs by{' '}
+                  <strong>{selectedMetric}</strong> (
+                  {orderDirection === 'asc' ? 'ascending' : 'descending'})
                   {customDuration && ` for ${customDuration} minutes`}
                 </p>
               </div>
@@ -209,8 +218,8 @@ export const TransitionLab: React.FC = () => {
         </div>
 
         {/* Results Section */}
-        <div className="results-section">
-          <OrderedPlaylist 
+        <div className='results-section'>
+          <OrderedPlaylist
             playlist={orderedPlaylist}
             isGenerating={isGenerating}
             onCreateNew={handleCreateNew}

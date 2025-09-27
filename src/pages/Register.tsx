@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayoutFancy from '../components/AuthLayoutFancy';
+import '../tailwind.css';
 interface RegisterValues {
   username: string;
   email: string;
