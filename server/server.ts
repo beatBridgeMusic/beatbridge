@@ -1,11 +1,13 @@
 import express from 'express';
-import type { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 import songsRoutes from './routes/songsRoutes.js';
+import authRouter from './routes/authRoutes';
 
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
+console.log('SERVICEROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -22,10 +24,8 @@ app.use(
 
 app.use('/songs', songsRoutes);
 
-app.get('/api/hello', (_req: Request, res: Response) => {
-  res.json({ message: 'Hello World!' });
-});
-
+app.use('/auth', authRouter);
+// aadsfsdf
 // catch-all route handler for any requests to an unknown route
 app.use((req, res) => {
   res.sendStatus(404);
