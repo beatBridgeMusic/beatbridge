@@ -103,7 +103,7 @@ const Register = () => {
               alt='Google'
               className='w-5 h-5'
             />
-            <span className='text-base font-medium '>Sign in with Google</span>
+            <span className='text-base font-medium '>Sign Up With Google</span>
           </button>
           <div className='text-center my-3'>
             <span>Already have account?</span>
