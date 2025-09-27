@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+/* this is currently causing Jamila's CSS to be buggy */
+/* @import 'tailwindcss'; */
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
