@@ -8,7 +8,10 @@ interface SongSelectorProps {
   onSongsChange: (songs: DbSong[]) => void;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({
+  selectedSongs,
+  onSongsChange,
+}) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
@@ -23,7 +26,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
         // TODO: Replace with better API call? or maybe it's too much work to refactor the frontend
         const response = await fetch('http://localhost:3001/songs/all');
         if (!response.ok) {
-          throw new Error(`Error fetching all songs, server returned ${response.status}`);
+          throw new Error(
+            `Error fetching all songs, server returned ${response.status}`
+          );
         }
         const data = await response.json();
 
@@ -99,7 +104,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
                 <span className='song-info'>
                   {song.track_name} - {song.artist_name_s}
                 </span>
-                <button onClick={() => handleRemoveSelectedSong(song.id)} className='remove-song-btn'>
+                <button
+                  onClick={() => handleRemoveSelectedSong(song.id)}
+                  className='remove-song-btn'
+                >
                   ✕
                 </button>
               </div>
@@ -110,7 +118,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
 
       {/* Song Selection Dropdown */}
       <div className='song-dropdown'>
-        <button className='dropdown-toggle' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+        <button
+          className='dropdown-toggle'
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
           Add Songs ({filteredAndSortedSongs.length} available)
           <span className={`arrow ${isDropdownOpen ? 'up' : 'down'}`}>▼</span>
         </button>
@@ -128,7 +139,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
+                onChange={(e) =>
+                  setSortBy(e.target.value as 'artist' | 'title')
+                }
                 className='sort-select'
               >
                 <option value='artist'>Sort by Artist</option>
@@ -140,12 +153,15 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
             <div className='songs-list'>
               {filteredAndSortedSongs.map((song) => {
                 const isSelected = selectedSongs.some((s) => s.id === song.id);
-                const isDisabled = !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
+                const isDisabled =
+                  !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
 
                 return (
                   <div
                     key={song.id}
-                    className={`song-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                    className={`song-item ${isSelected ? 'selected' : ''} ${
+                      isDisabled ? 'disabled' : ''
+                    }`}
                   >
                     <label className='song-checkbox'>
                       <input
@@ -167,7 +183,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
               })}
 
               {filteredAndSortedSongs.length === 0 && (
-                <div className='no-results'>No songs found matching your search</div>
+                <div className='no-results'>
+                  No songs found matching your search
+                </div>
               )}
             </div>
           </div>
@@ -177,10 +195,14 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
       {/* Selection Status */}
       <div className='selection-status'>
         {selectedSongs.length < MIN_SONG_SELECTION && (
-          <p className='warning'>Select at least {MIN_SONG_SELECTION} songs to create a playlist</p>
+          <p className='warning'>
+            Select at least {MIN_SONG_SELECTION} songs to create a playlist
+          </p>
         )}
         {selectedSongs.length >= MIN_SONG_SELECTION && (
-          <p className='success'>Ready to order! {selectedSongs.length} songs selected</p>
+          <p className='success'>
+            Ready to order! {selectedSongs.length} songs selected
+          </p>
         )}
       </div>
     </div>
