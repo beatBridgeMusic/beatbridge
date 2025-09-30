@@ -51,8 +51,9 @@ export const DurationInput: React.FC<DurationInputProps> = ({
 
   return (
     <div className="duration-input">
-      <h3>Playlist Duration (Optional)</h3>
-      <p>Set a target duration to trim or repeat your playlist</p>
+      {/* ✅ UPDATED: Removed redundant h3 heading since step card has title */}
+      {/* 🟢 SIMPLIFIED: Just description text now, no duplicate heading */}
+      <p className="step-description">Set a target duration to trim or repeat your playlist</p>
       
       {/* Current Selection Info */}
       {selectedSongs.length > 0 && (

@@ -1,4 +1,4 @@
-// src/features/transitions/components/SongSelector.tsx
+/// src/features/transitions/components/SongSelector.tsx
 import React, { useState, useEffect } from 'react';
 import type { DbSong } from '../types';
 import { MAX_SONG_SELECTION, MIN_SONG_SELECTION } from '../constants';
@@ -169,8 +169,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
   return (
     <div className="song-selector">
-      <h3>Choose Your Songs</h3>
-      <p>Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database</p>
+      {/* ✅ REMOVED: <h3>Choose Your Songs</h3> - now handled by step card header */}
+      {/* 🟢 CHANGED: Added step-description class, removed duplicate heading */}
+      <p className="step-description">Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database</p>
       
       {/* Selected Songs Display */}
       {selectedSongs.length > 0 && (
@@ -263,7 +264,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
         )}
       </div>
 
-      {/* Selection-Status removed due to redundancy - Jamila */}
+      {/* ✅ REMOVED: Redundant selection status - TransitionLab handles this via conditional steps */}
     </div>
   );
 };
