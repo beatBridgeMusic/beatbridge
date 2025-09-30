@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayoutFancy from '../components/AuthLayoutFancy';
-
+import { useAuth } from '../AuthContext';
 interface LoginValues {
   email: string;
   password: string;
@@ -13,6 +13,7 @@ const Login = () => {
     password: '',
   });
   const navigate = useNavigate();
+  const { login } = useAuth();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -25,15 +26,13 @@ const Login = () => {
         values
       );
       const { user, session } = response.data;
-      localStorage.setItem(
-        'access_token from login user',
-        session.access_token
-      );
+      login(user, session.access_token);
+
       console.log('userData:', response.data);
       console.log('logged in:', user);
       navigate('/');
     } catch (err) {
-      console.log(err);
+      console.log('Login failed:', err);
     }
   };
   return (

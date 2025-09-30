@@ -6,7 +6,8 @@ import { SongSelector } from './SongSelector.js';
 import { MetricSelector } from './MetricSelector.js';
 import { DurationInput } from './DurationInput.js';
 import { OrderedPlaylist } from './OrderedPlaylist.js';
-
+import { useAuth } from '../../../AuthContext';
+import { useNavigate } from 'react-router-dom';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
@@ -16,6 +17,7 @@ export const TransitionLab: React.FC = () => {
   const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const { user, logout } = useAuth();
   // Check if we can generate a playlist
   const canGenerate = selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
 
@@ -136,13 +138,26 @@ export const TransitionLab: React.FC = () => {
     setCustomDuration(null);
     setOrderedPlaylist(null);
   };
-
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
   return (
     <div className='transition-lab'>
       {/* Header */}
       <header className='lab-header'>
-        <h1>🎵 BeatBridge</h1>
-        <p>Order your songs by any metric for the perfect flow</p>
+        <div>
+          <h1>🎵 BeatBridge</h1>
+          <p>Order your songs by any metric for the perfect flow</p>
+        </div>
+        {/* i just put username and logout here to see whos logged in */}
+        {user && (
+          <div>
+            <span>Hello, {user.username ?? user.email}</span>
+            <button onClick={handleLogout}>Logout</button>
+          </div>
+        )}
       </header>
 
       <div className='lab-content'>
