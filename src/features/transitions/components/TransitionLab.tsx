@@ -158,63 +158,71 @@ export const TransitionLab: React.FC = () => {
       <div className='lab-content'>
         {/* Configuration Section */}
         <div className='configuration-section'>
-          {/* Step 1: Song Selection */}
-          <div className='config-step'>
-            <div className='step-number'>Step 1:</div>
-            <SongSelector
-              selectedSongs={selectedSongs}
-              onSongsChange={setSelectedSongs}
-            />
-          </div>
 
-          {/* Step 2: Metric Selection */}
-          {selectedSongs.length >= MIN_SONG_SELECTION && (
-            <div className='config-step'>
-              <div className='step-number'>Step 2:</div>
-              <MetricSelector
-                selectedMetric={selectedMetric}
-                onMetricChange={setSelectedMetric}
-                orderDirection={orderDirection}
-                onDirectionChange={setOrderDirection}
-              />
-            </div>
-          )}
+         {/* Step 1: Song Selection */}
+<div className='config-step-card'>
+  <div className='step-header'>
+    <div className='step-number'>Step 1</div>
+    <div className='step-title'>Choose Your Songs</div> {/* Add this back */}
+  </div>
+  <div className='step-content'>
+    <SongSelector
+      selectedSongs={selectedSongs}
+      onSongsChange={setSelectedSongs}
+    />
+  </div>
+</div>
 
-          {/* Step 3: Duration (Optional) */}
-          {selectedMetric && (
-            <div className='config-step'>
-              <div className='step-number'>Step 3:</div>
-              <DurationInput
-                selectedSongs={selectedSongs}
-                customDuration={customDuration}
-                onDurationChange={setCustomDuration}
-              />
-            </div>
-          )}
+{/* Step 2: Metric Selection */}
+{selectedSongs.length >= MIN_SONG_SELECTION && (
+  <div className='config-step-card'>
+    <div className='step-header'>
+      <div className='step-number'>Step 2</div>
+      <div className='step-title'>Choose Your Flow</div> {/* Add this back */}
+    </div>
+    <div className='step-content'>
+      <MetricSelector
+        selectedMetric={selectedMetric}
+        onMetricChange={setSelectedMetric}
+        orderDirection={orderDirection}
+        onDirectionChange={setOrderDirection}
+      />
+    </div>
+  </div>
+)}
 
-          {/* Generate Button */}
-          {canGenerate && (
-            <div className='generate-section'>
-              <button
-                onClick={handleGeneratePlaylist}
-                disabled={isGenerating}
-                className='generate-playlist-btn'
-              >
-                {isGenerating
-                  ? 'Creating Your Beat Bridge...'
-                  : 'Create Beat Bridge'}
-              </button>
+{/* Step 3: Duration (Optional) */}
+{selectedMetric && (
+  <div className='config-step-card'>
+    <div className='step-header'>
+      <div className='step-number'>Step 3</div>
+      <div className='step-title'>Set Duration</div> {/* Add this back */}
+      <div className='step-optional'>(Optional)</div> {/* Add this back */}
+    </div>
+    <div className='step-content'>
+      <DurationInput
+        selectedSongs={selectedSongs}
+        customDuration={customDuration}
+        onDurationChange={setCustomDuration}
+      />
+    </div>
+  </div>
+)}
 
-              <div className='generation-preview'>
-                <p>
-                  Ready to order {selectedSongs.length} songs by{' '}
-                  <strong>{selectedMetric}</strong> (
-                  {orderDirection === 'asc' ? 'ascending' : 'descending'})
-                  {customDuration && ` for ${customDuration} minutes`}
-                </p>
-              </div>
-            </div>
-          )}
+{/* Generate Button */}
+{canGenerate && (
+  <div className='generate-section-card'>
+    <h3>Ready to Create Your Beat Bridge!</h3> {/* Add heading */}
+    <button
+      onClick={handleGeneratePlaylist}
+      disabled={isGenerating}
+      className='generate-playlist-btn'
+    >
+      {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
+    </button>
+    {/* ✅ REMOVED: generation-preview div - redundant summary */}
+  </div>
+)}
         </div>
 
         {/* Results Section */}
