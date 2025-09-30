@@ -32,13 +32,7 @@ export interface DbSong {
 }
 
 // Available metrics for ordering songs
-export type OrderingMetric = 
-  | 'tempo' 
-  | 'energy' 
-  | 'valence' 
-  | 'danceability' 
-  | 'loudness' 
-  | 'popularity';
+export type OrderingMetric = 'tempo' | 'energy' | 'valence' | 'danceability' | 'loudness' | 'popularity';
 
 // User's playlist configuration
 export interface PlaylistConfig {

@@ -1,10 +1,6 @@
 // src/features/transitions/components/TransitionLab.tsx
 import React, { useState } from 'react';
-import type {
-  DbSong,
-  OrderingMetric,
-  OrderedPlaylist as OrderedPlaylistType,
-} from '../types';
+import type { DbSong, OrderingMetric, OrderedPlaylist as OrderedPlaylistType } from '../types';
 import { MIN_SONG_SELECTION } from '../constants';
 import { SongSelector } from './SongSelector.js';
 import { MetricSelector } from './MetricSelector.js';
@@ -14,18 +10,14 @@ import { OrderedPlaylist } from './OrderedPlaylist.js';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
-  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(
-    null
-  );
+  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(null);
   const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('asc');
   const [customDuration, setCustomDuration] = useState<number | null>(null);
-  const [orderedPlaylist, setOrderedPlaylist] =
-    useState<OrderedPlaylistType | null>(null);
+  const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Check if we can generate a playlist
-  const canGenerate =
-    selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
+  const canGenerate = selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
 
   const handleGeneratePlaylist = async () => {
     if (!canGenerate) return;
@@ -118,9 +110,7 @@ export const TransitionLab: React.FC = () => {
         }
       }
 
-      const totalDuration = Math.round(
-        finalSongs.reduce((sum, song) => sum + song.duration_ms, 0) / 60000
-      );
+      const totalDuration = Math.round(finalSongs.reduce((sum, song) => sum + song.duration_ms, 0) / 60000);
 
       const playlist: OrderedPlaylistType = {
         id: `playlist-${Date.now()}`,
@@ -161,10 +151,7 @@ export const TransitionLab: React.FC = () => {
           {/* Step 1: Song Selection */}
           <div className='config-step'>
             <div className='step-number'>Step 1:</div>
-            <SongSelector
-              selectedSongs={selectedSongs}
-              onSongsChange={setSelectedSongs}
-            />
+            <SongSelector selectedSongs={selectedSongs} onSongsChange={setSelectedSongs} />
           </div>
 
           {/* Step 2: Metric Selection */}
@@ -195,20 +182,13 @@ export const TransitionLab: React.FC = () => {
           {/* Generate Button */}
           {canGenerate && (
             <div className='generate-section'>
-              <button
-                onClick={handleGeneratePlaylist}
-                disabled={isGenerating}
-                className='generate-playlist-btn'
-              >
-                {isGenerating
-                  ? 'Creating Your Beat Bridge...'
-                  : 'Create Beat Bridge'}
+              <button onClick={handleGeneratePlaylist} disabled={isGenerating} className='generate-playlist-btn'>
+                {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
               </button>
 
               <div className='generation-preview'>
                 <p>
-                  Ready to order {selectedSongs.length} songs by{' '}
-                  <strong>{selectedMetric}</strong> (
+                  Ready to order {selectedSongs.length} songs by <strong>{selectedMetric}</strong> (
                   {orderDirection === 'asc' ? 'ascending' : 'descending'})
                   {customDuration && ` for ${customDuration} minutes`}
                 </p>
@@ -219,11 +199,7 @@ export const TransitionLab: React.FC = () => {
 
         {/* Results Section */}
         <div className='results-section'>
-          <OrderedPlaylist
-            playlist={orderedPlaylist}
-            isGenerating={isGenerating}
-            onCreateNew={handleCreateNew}
-          />
+          <OrderedPlaylist playlist={orderedPlaylist} isGenerating={isGenerating} onCreateNew={handleCreateNew} />
         </div>
       </div>
     </div>
