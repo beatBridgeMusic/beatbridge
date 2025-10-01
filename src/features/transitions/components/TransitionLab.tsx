@@ -24,27 +24,11 @@ export const TransitionLab: React.FC = () => {
 
   const handleGeneratePlaylist = async () => {
     if (!canGenerate) return;
-
     setIsGenerating(true);
-
+    
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/transitions/order', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     songs: selectedSongs,
-      //     metric: selectedMetric,
-      //     direction: orderDirection,
-      //     duration: customDuration
-      //   })
-      // });
-      // const data = await response.json();
-
-      // Simulate API delay
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Mock ordering logic (will be replaced by Will's backend)
       const orderedSongs = [...selectedSongs].sort((a, b) => {
         let aValue: number, bValue: number;
 
@@ -80,14 +64,12 @@ export const TransitionLab: React.FC = () => {
         return orderDirection === 'asc' ? aValue - bValue : bValue - aValue;
       });
 
-      // Apply duration filtering if specified
       let finalSongs = orderedSongs;
       if (customDuration) {
         const targetDurationMs = customDuration * 60000;
         let currentDuration = 0;
         finalSongs = [];
 
-        // Add songs until we reach target duration
         for (const song of orderedSongs) {
           if (currentDuration + song.duration_ms <= targetDurationMs) {
             finalSongs.push(song);
@@ -97,7 +79,6 @@ export const TransitionLab: React.FC = () => {
           }
         }
 
-        // If we haven't reached target duration, repeat songs
         if (currentDuration < targetDurationMs && orderedSongs.length > 0) {
           let songIndex = 0;
           while (currentDuration < targetDurationMs) {
@@ -126,7 +107,6 @@ export const TransitionLab: React.FC = () => {
       setOrderedPlaylist(playlist);
     } catch (error) {
       console.error('Failed to generate playlist:', error);
-      // TODO: Add proper error handling
     } finally {
       setIsGenerating(false);
     }
@@ -145,37 +125,59 @@ export const TransitionLab: React.FC = () => {
     navigate('/login');
   };
   return (
-    <div className='transition-lab'>
-      {/* Header */}
-      <header className='lab-header'>
-        <div>
-          <h1>🎵 BeatBridge</h1>
-          <p>Order your songs by any metric for the perfect flow</p>
-        </div>
-        {/* i just put username and logout here to see whos logged in */}
-        {user && (
-          <div>
-            <span>Hello, {user.username ?? user.email}</span>
-            <button onClick={handleLogout}>Logout</button>
+    <div className="relative bg-animated min-h-screen">
+      {/* Overlay for depth */}
+      <div className="absolute inset-0 bg-black/20 z-0"></div>
+      
+      {/* Floating musical elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute text-white/20 text-xl"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `bounce ${3 + Math.random() * 2}s infinite`,
+              animationDelay: `${Math.random() * 3}s`
+            }}
+          >
+            🎵
           </div>
-        )}
+        ))}
+      </div>
+
+      {/* Header */}
+      <header className="relative z-50 text-center text-white pt-8 pb-6">
+        <h1 className="text-4xl font-extrabold">🎵 BeatBridge</h1>
+        <p className="text-lg font-light">Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
       <UploadCSV></UploadCSV>
 
-      <div className='lab-content'>
+      <div className="relative z-40 max-w-4xl mx-auto px-4 pb-12">
         {/* Configuration Section */}
-        <div className='configuration-section'>
+        <div className="space-y-6">
+          
           {/* Step 1: Song Selection */}
-          <div className='config-step'>
-            <div className='step-number'>Step 1:</div>
-            <SongSelector selectedSongs={selectedSongs} onSongsChange={setSelectedSongs} />
+          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">1</div>
+              <h2 className="text-xl font-semibold text-white">Choose Your Songs</h2>
+            </div>
+            <SongSelector
+              selectedSongs={selectedSongs}
+              onSongsChange={setSelectedSongs}
+            />
           </div>
 
           {/* Step 2: Metric Selection */}
           {selectedSongs.length >= MIN_SONG_SELECTION && (
-            <div className='config-step'>
-              <div className='step-number'>Step 2</div>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">2</div>
+                <h2 className="text-xl font-semibold text-white">Choose Your Flow</h2>
+              </div>
               <MetricSelector
                 selectedMetric={selectedMetric}
                 onMetricChange={setSelectedMetric}
@@ -185,10 +187,14 @@ export const TransitionLab: React.FC = () => {
             </div>
           )}
 
-          {/* Step 3: Duration (Optional) */}
+          {/* Step 3: Duration */}
           {selectedMetric && (
-            <div className='config-step'>
-              <div className='step-number'>3</div>
+            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">3</div>
+                <h2 className="text-xl font-semibold text-white">Set Duration</h2>
+                <span className="text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full">(Optional)</span>
+              </div>
               <DurationInput
                 selectedSongs={selectedSongs}
                 customDuration={customDuration}
@@ -199,25 +205,26 @@ export const TransitionLab: React.FC = () => {
 
           {/* Generate Button */}
           {canGenerate && (
-            <div className='generate-section'>
-              <button onClick={handleGeneratePlaylist} disabled={isGenerating} className='generate-playlist-btn'>
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30">
+              <h3 className="text-2xl font-bold text-white mb-4 text-center">Ready to Create Your Beat Bridge!</h3>
+              <button
+                onClick={handleGeneratePlaylist}
+                disabled={isGenerating}
+                className="w-full bg-white text-blue-600 py-4 px-8 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
               </button>
-
-              <div className='generation-preview'>
-                <p>
-                  Ready to order {selectedSongs.length} songs by <strong>{selectedMetric}</strong> (
-                  {orderDirection === 'asc' ? 'ascending' : 'descending'})
-                  {customDuration && ` for ${customDuration} minutes`}
-                </p>
-              </div>
             </div>
           )}
         </div>
 
         {/* Results Section */}
-        <div className='results-section'>
-          <OrderedPlaylist playlist={orderedPlaylist} isGenerating={isGenerating} onCreateNew={handleCreateNew} />
+        <div className="mt-8">
+          <OrderedPlaylist
+            playlist={orderedPlaylist}
+            isGenerating={isGenerating}
+            onCreateNew={handleCreateNew}
+          />
         </div>
       </div>
     </div>
