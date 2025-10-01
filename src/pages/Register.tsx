@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthLayoutFancy from '../components/AuthLayoutFancy';
-
+import { useAuth } from '../AuthContext';
 interface RegisterValues {
   username: string;
   email: string;
@@ -16,6 +16,7 @@ const Register = () => {
   });
 
   const navigate = useNavigate();
+  const { login } = useAuth();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -29,10 +30,16 @@ const Register = () => {
       );
       console.log(response);
       if (response.status === 200) {
-        navigate('/login');
+        const { user } = response.data;
+        if (response.data.session) {
+          login(user, response.data.session.access_token);
+          navigate('/');
+        } else {
+          navigate('/login');
+        }
       }
     } catch (err) {
-      console.log(err);
+      console.log('Registration failed:', err);
     }
   };
   return (
@@ -72,7 +79,7 @@ const Register = () => {
                 Password
               </label>
               <input
-                type='text'
+                type='password'
                 placeholder='Enter Password'
                 className='w-full px-3 py-2 border rounded-lg'
                 name='password'

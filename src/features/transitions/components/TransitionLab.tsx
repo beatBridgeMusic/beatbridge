@@ -10,23 +10,29 @@ import { SongSelector } from './SongSelector.js';
 import { MetricSelector } from './MetricSelector.js';
 import { DurationInput } from './DurationInput.js';
 import { OrderedPlaylist } from './OrderedPlaylist.js';
-
+import { useAuth } from '../../../AuthContext';
+import { useNavigate } from 'react-router-dom';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
-  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(null);
+  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(
+    null
+  );
   const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('asc');
   const [customDuration, setCustomDuration] = useState<number | null>(null);
-  const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
+  const [orderedPlaylist, setOrderedPlaylist] =
+    useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const { user, logout } = useAuth();
   // Check if we can generate a playlist
-  const canGenerate = selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
+  const canGenerate =
+    selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
 
   const handleGeneratePlaylist = async () => {
     if (!canGenerate) return;
     setIsGenerating(true);
-    
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -122,23 +128,27 @@ export const TransitionLab: React.FC = () => {
     setCustomDuration(null);
     setOrderedPlaylist(null);
   };
-
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
   return (
-    <div className="relative bg-animated min-h-screen">
+    <div className='relative bg-animated min-h-screen'>
       {/* Overlay for depth */}
-      <div className="absolute inset-0 bg-black/20 z-0"></div>
-      
+      <div className='absolute inset-0 bg-black/20 z-0'></div>
+
       {/* Floating musical elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="absolute text-white/20 text-xl"
+            className='absolute text-white/20 text-xl'
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animation: `bounce ${3 + Math.random() * 2}s infinite`,
-              animationDelay: `${Math.random() * 3}s`
+              animationDelay: `${Math.random() * 3}s`,
             }}
           >
             🎵
@@ -147,20 +157,25 @@ export const TransitionLab: React.FC = () => {
       </div>
 
       {/* Header */}
-      <header className="relative z-50 text-center text-white pt-8 pb-6">
-        <h1 className="text-4xl font-extrabold">🎵 BeatBridge</h1>
-        <p className="text-lg font-light">Order your customized playlist by any metric for the perfect flow</p>
+      <header className='relative z-50 text-center text-white pt-8 pb-6'>
+        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
+        <p className='text-lg font-light'>
+          Order your customized playlist by any metric for the perfect flow
+        </p>
       </header>
 
-      <div className="relative z-40 max-w-4xl mx-auto px-4 pb-12">
+      <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>
         {/* Configuration Section */}
-        <div className="space-y-6">
-          
+        <div className='space-y-6'>
           {/* Step 1: Song Selection */}
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">1</div>
-              <h2 className="text-xl font-semibold text-white">Choose Your Songs</h2>
+          <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
+            <div className='flex items-center gap-4 mb-4'>
+              <div className='bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
+                1
+              </div>
+              <h2 className='text-xl font-semibold text-white'>
+                Choose Your Songs
+              </h2>
             </div>
             <SongSelector
               selectedSongs={selectedSongs}
@@ -170,10 +185,14 @@ export const TransitionLab: React.FC = () => {
 
           {/* Step 2: Metric Selection */}
           {selectedSongs.length >= MIN_SONG_SELECTION && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">2</div>
-                <h2 className="text-xl font-semibold text-white">Choose Your Flow</h2>
+            <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
+              <div className='flex items-center gap-4 mb-4'>
+                <div className='bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
+                  2
+                </div>
+                <h2 className='text-xl font-semibold text-white'>
+                  Choose Your Flow
+                </h2>
               </div>
               <MetricSelector
                 selectedMetric={selectedMetric}
@@ -186,11 +205,17 @@ export const TransitionLab: React.FC = () => {
 
           {/* Step 3: Duration */}
           {selectedMetric && (
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg">
-              <div className="flex items-center gap-4 mb-4">
-                <div className="bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold">3</div>
-                <h2 className="text-xl font-semibold text-white">Set Duration</h2>
-                <span className="text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full">(Optional)</span>
+            <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
+              <div className='flex items-center gap-4 mb-4'>
+                <div className='bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
+                  3
+                </div>
+                <h2 className='text-xl font-semibold text-white'>
+                  Set Duration
+                </h2>
+                <span className='text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full'>
+                  (Optional)
+                </span>
               </div>
               <DurationInput
                 selectedSongs={selectedSongs}
@@ -202,21 +227,25 @@ export const TransitionLab: React.FC = () => {
 
           {/* Generate Button */}
           {canGenerate && (
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30">
-              <h3 className="text-2xl font-bold text-white mb-4 text-center">Ready to Create Your Beat Bridge!</h3>
+            <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30'>
+              <h3 className='text-2xl font-bold text-white mb-4 text-center'>
+                Ready to Create Your Beat Bridge!
+              </h3>
               <button
                 onClick={handleGeneratePlaylist}
                 disabled={isGenerating}
-                className="w-full bg-white text-blue-600 py-4 px-8 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className='w-full bg-white text-blue-600 py-4 px-8 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
+                {isGenerating
+                  ? 'Creating Your Beat Bridge...'
+                  : 'Create Beat Bridge'}
               </button>
             </div>
           )}
         </div>
 
         {/* Results Section */}
-        <div className="mt-8">
+        <div className='mt-8'>
           <OrderedPlaylist
             playlist={orderedPlaylist}
             isGenerating={isGenerating}
