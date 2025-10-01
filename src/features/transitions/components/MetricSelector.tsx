@@ -33,8 +33,9 @@ export const MetricSelector: React.FC<MetricSelectorProps> = ({
 
   return (
     <div className="metric-selector">
-      <h3>Choose Your Flow</h3>
-      <p>Pick how you want your songs ordered for the perfect transition</p>
+      {/* ✅ UPDATED: Removed redundant h3 heading since step card has title */}
+      {/* 🟢 SIMPLIFIED: Just description text now, no duplicate heading */}
+      <p className="step-description">Pick how you want your songs ordered for the perfect transition</p>
       
       <div className="metric-selection">
         <label htmlFor="metric-dropdown">Order by:</label>
