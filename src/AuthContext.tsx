@@ -1,14 +1,13 @@
 import React, { createContext, useState, ReactNode, useContext } from 'react';
 /* eslint-disable react-refresh/only-export-components */
-
-// 1) Define the User type (adjust fields depending on your backend)
+import { useEffect } from 'react';
 interface User {
   id: string;
   email: string;
   username?: string;
 }
 
-// 2) Define context type
+//  Define context type
 interface AuthContextType {
   user: User | null;
   token: string | null;
@@ -16,12 +15,12 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// 3) Create context
+// Create context
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
 
-// 4) Props for provider
+// Props for provider
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -29,17 +28,28 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
-
+  useEffect(() => {
+    const storedToken = localStorage.getItem('access_token');
+    const storedUser = localStorage.getItem('user');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
   const login = (userData: User, accessToken: string) => {
     setUser(userData);
     setToken(accessToken);
     localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
   };
 
   return (

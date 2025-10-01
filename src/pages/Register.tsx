@@ -79,7 +79,7 @@ const Register = () => {
                 Password
               </label>
               <input
-                type='text'
+                type='password'
                 placeholder='Enter Password'
                 className='w-full px-3 py-2 border rounded-lg'
                 name='password'
