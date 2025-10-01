@@ -8,6 +8,7 @@ import { DurationInput } from './DurationInput.js';
 import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import UploadCSV from '../../../components/UploadCSV';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
@@ -159,6 +160,8 @@ export const TransitionLab: React.FC = () => {
           </div>
         )}
       </header>
+
+      <UploadCSV></UploadCSV>
 
       <div className='lab-content'>
         {/* Configuration Section */}
