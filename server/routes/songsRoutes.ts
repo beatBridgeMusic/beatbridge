@@ -15,4 +15,8 @@ router.get('/trackNames', songsController.getAllTrackNames, (req, res) => {
   res.status(200).json(res.locals.songsList);
 });
 
+router.post('/upload', songsController.uploadPlaylist, (req, res) => {
+  res.status(200).json(res.locals.uploadResult);
+})
+
 export default router;

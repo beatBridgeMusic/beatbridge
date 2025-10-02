@@ -21,16 +21,14 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        'http://localhost:3001/auth/login',
-        values
-      );
+      const response = await axios.post('http://localhost:3001/auth/login', values);
       const { user, session } = response.data;
+      const uuid = session.user.id;
       login(user, session.access_token);
 
       console.log('userData:', response.data);
       console.log('logged in:', user);
-      navigate('/');
+      navigate('/', { state: { uuid } });
     } catch (err) {
       console.log('Login failed:', err);
     }
@@ -81,27 +79,19 @@ const Login = () => {
              shadow-sm hover:shadow-md py-2 
              transform transition duration-200 
              hover:scale-105 active:scale-95'
-              onClick={() =>
-                (window.location.href =
-                  'http://localhost:3001/auth/login/google')
-              }
+              onClick={() => (window.location.href = 'http://localhost:3001/auth/login/google')}
             >
               <img
                 src='https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg'
                 alt='Google'
                 className='w-5 h-5'
               />
-              <span className='text-base font-medium '>
-                Sign in with Google
-              </span>
+              <span className='text-base font-medium '>Sign in with Google</span>
             </button>
           </form>
           <div className='text-center my-3'>
             <span>Don't have an account?</span>
-            <Link
-              to='/register'
-              className='text-blue-900 mx-3 hover:text-green-600 transition-colors duration-200'
-            >
+            <Link to='/register' className='text-blue-900 mx-3 hover:text-green-600 transition-colors duration-200'>
               Register
             </Link>
           </div>

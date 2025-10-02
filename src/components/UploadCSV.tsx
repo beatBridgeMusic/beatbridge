@@ -2,52 +2,11 @@ import React, { useMemo, useState } from 'react';
 import Papa from 'papaparse';
 import { useAuth } from '../AuthContext'; // provides { user, token }
 
-// Tiny helper: map common Exportify column names to our canonical fields
-function normalizeRow(raw: Record<string, any>) {
-  // Tolerate Title/Track, Artist Name/Artist, etc.
-  const title = raw.title ?? raw.Title ?? raw.track_name ?? raw.Track ?? null;
-  const artist = raw.artist ?? raw.Artist ?? raw.artist_name ?? null;
-  const album = raw.album ?? raw.Album ?? raw.album_name ?? null;
-  const duration_ms = raw.duration_ms ?? raw.Duration_ms ?? raw.duration ?? null;
-  const track_uri = raw.track_uri ?? raw.Uri ?? raw.uri ?? raw.spotify_uri ?? null;
-  // Audio features (optional; pass through if present)
-  const danceability = raw.danceability ?? null;
-  const energy = raw.energy ?? null;
-  const valence = raw.valence ?? null;
-  const tempo = raw.tempo ?? null;
-  const loudness = raw.loudness ?? null;
-  const key = raw.key ?? null;
-  const mode = raw.mode ?? null;
-  const speechiness = raw.speechiness ?? null;
-  const acousticness = raw.acousticness ?? null;
-  const instrumentalness = raw.instrumentalness ?? null;
-  const liveness = raw.liveness ?? null;
-  const time_signature = raw.time_signature ?? null;
+type UploadPlaylistProps = {
+  uuid: string;
+};
 
-  return {
-    title,
-    artist,
-    album,
-    duration_ms,
-    track_uri,
-    danceability,
-    energy,
-    valence,
-    tempo,
-    loudness,
-    key,
-    mode,
-    speechiness,
-    acousticness,
-    instrumentalness,
-    liveness,
-    time_signature,
-    // Keep the original row for audit/debug on the server
-    _raw: raw,
-  };
-}
-
-export default function UploadPlaylist() {
+export default function UploadPlaylist({ uuid }: UploadPlaylistProps) {
   const { user, token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
@@ -56,6 +15,8 @@ export default function UploadPlaylist() {
 
   const preview = useMemo(() => rows.slice(0, 5), [rows]);
 
+  console.log('uuid inside uploadCSV:', uuid);
+
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
     setFile(f);
@@ -63,16 +24,34 @@ export default function UploadPlaylist() {
     setStatus('');
     if (!f) return;
 
+    //           Papa.parse(file, {
+    //             header: true, // uses first row as column names
+    //             dynamicTyping: true,
+    //             skipEmptyLines: true,
+    //             complete: (result) => {
+    //               console.log('Parsed:', result.data.slice(0, 2));
+    //               setRows(result.data as any[]);
+
+    // Papa.parse(f, {
+    //   header: true,
+    //   dynamicTyping: true,
+    //   skipEmptyLines: true,
+    //   complete: (result) => {
+    //     const normalized = (result.data as Record<string, any>[]).filter(Boolean).map(normalizeRow);
+    //     setRows(normalized);
+    //     setStatus(`Parsed ${normalized.length} rows`);
+    //   },
+    //   error: (err) => setStatus(`Parse error: ${String(err)}`),
+    // });
+
     Papa.parse(f, {
       header: true,
       dynamicTyping: true,
       skipEmptyLines: true,
       complete: (result) => {
-        const normalized = (result.data as Record<string, any>[]).filter(Boolean).map(normalizeRow);
-        setRows(normalized);
-        setStatus(`Parsed ${normalized.length} rows`);
+        setRows(result.data as any[]);
+        setStatus(`Parsed ${result.data.length} rows`);
       },
-      error: (err) => setStatus(`Parse error: ${String(err)}`),
     });
   };
 
@@ -89,27 +68,28 @@ export default function UploadPlaylist() {
     setStatus('Uploading…');
 
     try {
-        console.log(user.id)
-        console.log(rows)
+      console.log('uuid', uuid)
+      console.log('user.id', user.id);
+      console.log('rows', rows);
       // POST to your backend. Backend should:
       // 1) Create a playlist tied to user.id
       // 2) Upsert rows into a GLOBAL tracks catalog (by track_uri or hash)
       // 3) Insert playlist->track mappings preserving order
-      const resp = await fetch('/api/playlists/upload', {
+      const resp = await fetch('http://localhost:3001/songs/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // If your backend expects the app token, include it:
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          // // If your backend expects the app token, include it:
+          // ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           playlistName: playlistName || (file ? file.name.replace(/\.csv$/i, '') : 'Untitled Upload'),
           rows,
           // IMPORTANT: Use your app user id; backend will trust token and ignore this if it verifies JWT itself.
-          userId: user.id,
+          uuid: uuid,
         }),
       });
-
+      console.log('resp:', resp);
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}));
         throw new Error(err.error || `HTTP ${resp.status}`);
