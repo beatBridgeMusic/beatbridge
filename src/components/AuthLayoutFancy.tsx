@@ -18,9 +18,9 @@ const AuthLayoutFancy = ({ children }: AuthLayoutProps) => {
 
       {/* Banner at the top */}
       <div className='relative z-50 text-center text-black pt-8 pb-0 flex-shrink-0'>
-        <h1 className='text-4xl font-extrabold'>BeatBridge</h1>
+        <h1 className='text-4xl font-extrabold'>BeatBridge.</h1>
         <p className='text-lg font-light'>
-          Where you can create your Music flow
+          Order your customized playlist by any metric for the perfect flow
         </p>
       </div>
 

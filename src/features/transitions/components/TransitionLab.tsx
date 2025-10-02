@@ -158,7 +158,7 @@ export const TransitionLab: React.FC = () => {
 
       {/* Header */}
       <header className='relative z-50 text-center text-white pt-8 pb-6'>
-        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
+        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge.</h1>
         <p className='text-lg font-light'>
           Order your customized playlist by any metric for the perfect flow
         </p>
