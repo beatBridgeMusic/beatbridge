@@ -5,30 +5,30 @@ const router = Router();
 // 'http://localhost:3001/auth/register'
 router.post('/register', async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
+
   try {
-    //creating user in auth
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
+      user_metadata: { username },
     });
+
     if (error || !data.user) {
       return res
         .status(400)
         .json({ error: error?.message || 'Registration failed' });
     }
 
-    const userId = data.user?.id;
-    //create profile row
-    const { error: profileError } = await supabaseAdmin
+    await supabaseAdmin
       .from('profiles')
-      .insert({ id: userId, username });
-    if (profileError)
-      return res.status(400).json({ error: profileError.message });
+      .update({ username })
+      .eq('id', data.user.id);
+
     res.status(200).json({ user: data.user });
   } catch (err) {
-    console.error('failed to register user:', err);
-    res.status(500).json({ error: `Server error` });
+    console.error('Failed to register user:', err);
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

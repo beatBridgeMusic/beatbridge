@@ -158,6 +158,22 @@ export const TransitionLab: React.FC = () => {
 
       {/* Header */}
       <header className='relative z-50 text-center text-white pt-8 pb-6'>
+        <div className='flex justify-between items-center max-w-4xl mx-auto px-4 mb-4'>
+          <div></div> {/* Spacer for centering */}
+          {user && (
+            <div className='flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20'>
+              <span className='text-sm'>
+                Hello, {user.username ?? user.email}
+              </span>
+              <button
+                onClick={handleLogout}
+                className='bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-sm font-medium transition-colors'
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
         <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
         <p className='text-lg font-light'>
           Order your customized playlist by any metric for the perfect flow
