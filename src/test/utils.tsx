@@ -1,15 +1,14 @@
 import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from '../AuthContext';
+import { AuthContext } from '../AuthContext';
+import type { AuthContextType, User } from '../AuthContext';
 
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  authValue?: {
-    user: any;
-    login: () => Promise<void>;
-    logout: () => void;
-    loading: boolean;
-  };
+  user?: User | null;
+  token?: string | null;
+  login?: (userData: User, accessToken: string) => void;
+  logout?: () => void;
 }
 
 export function renderWithRouter(
@@ -21,23 +20,38 @@ export function renderWithRouter(
 
 export function renderWithAuth(
   ui: ReactElement,
-  { authValue, ...options }: CustomRenderOptions = {}
+  { user = null, token = null, login = () => {}, logout = () => {}, ...options }: CustomRenderOptions = {}
 ) {
-  const defaultAuthValue = {
-    user: { id: '1', email: 'test@example.com', username: 'testuser' },
-    login: async () => {},
-    logout: () => {},
-    loading: false,
-    ...authValue,
+  // Default authenticated user
+  const defaultUser: User = {
+    id: '1',
+    email: 'test@example.com',
+    username: 'testuser',
+  };
+
+  const mockAuthValue: AuthContextType = {
+    user: user !== null ? user : defaultUser,
+    token: token !== null ? token : 'mock-token-123',
+    login,
+    logout,
   };
 
   const AllProviders = ({ children }: { children: React.ReactNode }) => (
-    <AuthProvider value={defaultAuthValue}>
+    <AuthContext.Provider value={mockAuthValue}>
       <BrowserRouter>{children}</BrowserRouter>
-    </AuthProvider>
+    </AuthContext.Provider>
   );
 
   return render(ui, { wrapper: AllProviders, ...options });
 }
 
-export * from '@testing-library/react';
+// Helper to render with unauthenticated state
+export function renderWithoutAuth(
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>
+) {
+  return renderWithAuth(ui, { user: null, token: null, ...options });
+}
+
+// Re-export commonly used testing utilities
+export { screen, waitFor, waitForElementToBeRemoved, within, fireEvent } from '@testing-library/react';
