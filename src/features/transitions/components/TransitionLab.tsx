@@ -12,6 +12,8 @@ import { DurationInput } from './DurationInput.js';
 import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
 import { useNavigate } from 'react-router-dom';
+import FloatingNotes from '../../../components/FloatingNotes';
+
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
@@ -139,23 +141,7 @@ export const TransitionLab: React.FC = () => {
       <div className='absolute inset-0 bg-black/20 z-0'></div>
 
       {/* Floating musical elements */}
-      <div className='absolute inset-0 overflow-hidden pointer-events-none'>
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            key={i}
-            className='absolute text-white/20 text-xl'
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `bounce ${3 + Math.random() * 2}s infinite`,
-              animationDelay: `${Math.random() * 3}s`,
-            }}
-          >
-            🎵
-          </div>
-        ))}
-      </div>
-
+      <FloatingNotes />
       {/* Header */}
       <header className='relative z-50 text-center text-white pt-8 pb-6'>
         <div className='flex justify-between items-center max-w-4xl mx-auto px-4 mb-4'>
