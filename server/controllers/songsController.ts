@@ -1,11 +1,58 @@
 import db from '../models/songsDatabaseModel';
 import { Request, Response, NextFunction } from 'express';
 
+interface PlaylistRow {
+  'Track URI': string;
+  [key: string]: any; // for other properties
+}
+
+function extractTrackUris(rows: PlaylistRow[]): string[] {
+  return rows.map((row) => row['Track URI']);
+}
+
 interface SongsController {
   uploadPlaylist(req: Request, res: Response, next: NextFunction): Promise<void>;
   getSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
   getAllSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
   getAllTrackNames(req: Request, res: Response, next: NextFunction): Promise<void>;
+}
+
+async function createPlaylist(userId: string, playlistName: string): Promise<string> {
+  console.log(`Creating playlist "${playlistName}" for user ${userId}`);
+  const result = await db.query(
+    `INSERT INTO playlists (user_id, name)
+     VALUES ($1, $2)
+     RETURNING id`,
+    [userId, playlistName]
+  );
+
+  const playlistId = result.rows[0].id;
+  console.log(`Created playlist with ID: ${playlistId}`);
+  return playlistId;
+}
+
+async function linkTracksToPlaylist(playlistId: string, trackUris: string[]): Promise<void> {
+  console.log(`Linking ${trackUris.length} tracks to playlist ${playlistId}`);
+
+  // Using a transaction to ensure all tracks are linked
+  await db.query('BEGIN');
+
+  try {
+    for (let i = 0; i < trackUris.length; i++) {
+      await db.query(
+        `INSERT INTO playlist_tracks (playlist_id, track_uri, position)
+         VALUES ($1, $2, $3)`,
+        [playlistId, trackUris[i], i]
+      );
+    }
+
+    await db.query('COMMIT');
+    console.log('Successfully linked all tracks to playlist');
+  } catch (error) {
+    await db.query('ROLLBACK');
+    console.error('Error linking tracks to playlist:', error);
+    throw error;
+  }
 }
 
 // index signature
@@ -32,6 +79,7 @@ const SORTABLE_METRICS: SortableMetrics = {
 };
 
 const songsController: SongsController = {
+  // TODO: should probablt split this up into uploadTracks, createPlaylist, linkTracksToPlaylist
   async uploadPlaylist(req, res, next) {
     try {
       const { playlistName, rows, userId } = req.body;
@@ -162,7 +210,7 @@ const songsController: SongsController = {
             song.time_signature,
           ];
 
-          console.log(`Upserting song ${index + 1}/${rows.length}: ${song.track_name}`);
+          // console.log(`Upserting song ${index + 1}/${rows.length}: ${song.track_name}`);
           await db.query(query, values);
         }
 
@@ -174,6 +222,21 @@ const songsController: SongsController = {
           rowsInserted: rows.length,
           playlistName,
         };
+
+        // create playlist and tie the playlist to the tracks (only after upserting the tracks)
+        try {
+          // helper function of creating playlist in playlists table. return the generated uuid as playlistId
+          const playlistId = await createPlaylist(userId, playlistName);
+          // helper function to add to playlist_tracks table
+          const trackUris = extractTrackUris(rows); // This is synchronous, no await needed
+          await linkTracksToPlaylist(playlistId, trackUris);
+
+          await db.query('COMMIT');
+        } catch (error) {
+          await db.query('ROLLBACK');
+          throw error;
+        }
+
         return next();
       } catch (error) {
         console.error('Error during transaction:', error);
