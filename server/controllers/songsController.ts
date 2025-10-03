@@ -33,11 +33,8 @@ const SORTABLE_METRICS: SortableMetrics = {
 
 const songsController: SongsController = {
   async uploadPlaylist(req, res, next) {
-    console.log('req.body:', req.body);
     try {
-      const { playlistName, rows } = req.body as { playlistName?: string; rows?: any[] };
-      // Derive user id: prefer middleware (req.user.id), else accept body.userId for MVP
-      const userId = (req as any).userId || (req.body && req.body.userId) || null;
+      const { playlistName, rows, userId } = req.body;
 
       if (!userId) {
         return next({
@@ -55,57 +52,136 @@ const songsController: SongsController = {
         });
       }
 
-      // arrays for bulk ops
-      const positions: number[] = rows.map((_, i) => i + 1);
-      const trackIds: string[] = rows.map((r) => r.track_id);
-      const titles: (string | null)[] = rows.map((r) => r.title);
-      const artists: (string | null)[] = rows.map((r) => r.artist);
-      const albums: (string | null)[] = rows.map((r) => r.album);
-      const durations: (number | null)[] = rows.map((r) =>
-        r.duration_ms === null || r.duration_ms === undefined ? null : Number(r.duration_ms)
-      );
+      if (!playlistName || playlistName === '') {
+        return next({
+          log: 'uploadPlaylist: missing playlist name',
+          status: 400,
+          message: { err: 'Missing playlist name' },
+        });
+      }
 
-      // transaction
+      // Start transaction
       await db.query('BEGIN');
 
-      // 1) create playlist
-      const pl = await db.query(
-        `insert into playlists (user_id, name, source)
-         values ($1, $2, 'csv')
-         returning id`,
-        [userId, playlistName || 'Untitled Upload']
-      );
-      const playlistId = pl.rows[0].id;
+      try {
+        console.log(`Processing ${rows.length} songs for playlist "${playlistName}"`);
 
-      // 2) upsert tracks into GLOBAL catalog
-      await db.query(
-        `insert into tracks (track_id, title, artist, album, duration_ms)
-         select * from unnest(
-           $1::text[], $2::text[], $3::text[], $4::text[], $5::int[]
-         )
-         on conflict (track_id) do update
-         set title = coalesce(excluded.title, tracks.title),
-             artist = coalesce(excluded.artist, tracks.artist),
-             album = coalesce(excluded.album, tracks.album),
-             duration_ms = coalesce(excluded.duration_ms, tracks.duration_ms)`,
-        [trackIds, titles, artists, albums, durations]
-      );
+        // Transform and validate the data
+        const transformedRows = rows.map((row) => ({
+          track_uri: row['Track URI'],
+          track_name: row['Track Name'],
+          album_name: row['Album Name'],
+          artist_names: row['Artist Name(s)'],
+          release_date: row['Release Date'],
+          duration_ms: row['Duration (ms)'],
+          popularity: row['Popularity'],
+          explicit: row['Explicit'],
+          added_by: row['Added By'],
+          added_at: row['Added At'],
+          genres: row['Genres'],
+          record_label: row['Record Label'],
+          danceability: row['Danceability'],
+          energy: row['Energy'],
+          key: row['Key'],
+          loudness: row['Loudness'],
+          mode: row['Mode'],
+          speechiness: row['Speechiness'],
+          acousticness: row['Acousticness'],
+          instrumentalness: row['Instrumentalness'],
+          liveness: row['Liveness'],
+          valence: row['Valence'],
+          tempo: row['Tempo'],
+          time_signature: row['Time Signature'],
+        }));
 
-      // 3) map playlist -> tracks (preserve order)
-      await db.query(
-        `insert into playlist_tracks (playlist_id, position, track_id)
-         select $1, t.pos, t.tid
-         from unnest($2::int[], $3::text[]) as t(pos, tid)
-         on conflict do nothing`,
-        [playlistId, positions, trackIds]
-      );
+        // Insert songs into the songs table
+        for (const [index, song] of transformedRows.entries()) {
+          const query = `
+            INSERT INTO tracks (
+              track_uri, track_name, album_name, artist_names, release_date, duration_ms, 
+              popularity, explicit, added_by, added_at, genres, record_label,
+              danceability, energy, key, loudness, mode, speechiness, acousticness, 
+              instrumentalness, liveness, valence, tempo, time_signature
+            )
+            VALUES (
+              $1, $2, $3, $4, $5, $6, $7, $8, $9, $10,
+              $11, $12, $13, $14, $15, $16, $17, $18, $19, $20,
+              $21, $22, $23, $24
+            )
+            ON CONFLICT (track_uri)
+            DO UPDATE SET
+              track_name = EXCLUDED.track_name,
+              album_name = EXCLUDED.album_name,
+              artist_names = EXCLUDED.artist_names,
+              release_date = EXCLUDED.release_date,
+              duration_ms = EXCLUDED.duration_ms,
+              popularity = EXCLUDED.popularity,
+              explicit = EXCLUDED.explicit,
+              added_by = EXCLUDED.added_by,
+              added_at = EXCLUDED.added_at,
+              genres = EXCLUDED.genres,
+              record_label = EXCLUDED.record_label,
+              danceability = EXCLUDED.danceability,
+              energy = EXCLUDED.energy,
+              key = EXCLUDED.key,
+              loudness = EXCLUDED.loudness,
+              mode = EXCLUDED.mode,
+              speechiness = EXCLUDED.speechiness,
+              acousticness = EXCLUDED.acousticness,
+              instrumentalness = EXCLUDED.instrumentalness,
+              liveness = EXCLUDED.liveness,
+              valence = EXCLUDED.valence,
+              tempo = EXCLUDED.tempo,
+              time_signature = EXCLUDED.time_signature;
+          `;
 
-      await db.query('COMMIT');
+          const values = [
+            song.track_uri,
+            song.track_name,
+            song.album_name,
+            song.artist_names,
+            song.release_date,
+            song.duration_ms,
+            song.popularity,
+            song.explicit,
+            song.added_by,
+            song.added_at,
+            song.genres,
+            song.record_label,
+            song.danceability,
+            song.energy,
+            song.key,
+            song.loudness,
+            song.mode,
+            song.speechiness,
+            song.acousticness,
+            song.instrumentalness,
+            song.liveness,
+            song.valence,
+            song.tempo,
+            song.time_signature,
+          ];
 
-      res.locals.uploadResult = { playlistId, rowsInserted: rows.length };
-      return next();
+          console.log(`Upserting song ${index + 1}/${rows.length}: ${song.track_name}`);
+          await db.query(query, values);
+        }
+
+        await db.query('COMMIT');
+        console.log('Successfully committed all songs to database');
+
+        res.locals.uploadResult = {
+          success: true,
+          rowsInserted: rows.length,
+          playlistName,
+        };
+        return next();
+      } catch (error) {
+        console.error('Error during transaction:', error);
+        await db.query('ROLLBACK');
+        throw error;
+      }
     } catch (error: any) {
-      await db.query('ROLLBACK');
+      console.error('Error in uploadPlaylist:', error);
       return next({
         log: `uploadPlaylist error: ${error?.message || error}`,
         status: 500,

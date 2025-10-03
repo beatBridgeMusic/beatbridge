@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import Papa from 'papaparse';
 import { useAuth } from '../AuthContext'; // provides { user, token }
 
-
 export default function UploadPlaylist() {
   const { user, token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
@@ -106,11 +105,11 @@ export default function UploadPlaylist() {
 
         <div className='grid gap-3'>
           <label className='block'>
-            <span className='block text-sm text-gray-700 mb-1'>Playlist name (optional)</span>
+            <span className='block text-sm text-gray-700 mb-1'>Playlist name</span>
             <input
               type='text'
               className='w-full border rounded-lg px-3 py-2'
-              placeholder='My Groovin’ Mix'
+              placeholder='My Mix'
               value={playlistName}
               onChange={(e) => setPlaylistName(e.target.value)}
             />
