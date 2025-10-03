@@ -7,7 +7,7 @@ import { MetricSelector } from './MetricSelector.js';
 import { DurationInput } from './DurationInput.js';
 import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import UploadCSV from '../../../components/UploadCSV';
 
 export const TransitionLab: React.FC = () => {
@@ -19,8 +19,6 @@ export const TransitionLab: React.FC = () => {
   const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const location = useLocation();
-  const uuid = location.state?.uuid;
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
@@ -157,7 +155,7 @@ export const TransitionLab: React.FC = () => {
         <p className="text-lg font-light">Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
-      <UploadCSV uuid={uuid}></UploadCSV>
+      <UploadCSV></UploadCSV>
 
       <div className="relative z-40 max-w-4xl mx-auto px-4 pb-12">
         {/* Configuration Section */}

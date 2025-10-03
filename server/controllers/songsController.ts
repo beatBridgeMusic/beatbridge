@@ -37,13 +37,13 @@ const songsController: SongsController = {
     try {
       const { playlistName, rows } = req.body as { playlistName?: string; rows?: any[] };
       // Derive user id: prefer middleware (req.user.id), else accept body.userId for MVP
-      const uuid = (req as any).uuid || (req.body && req.body.uuid) || null;
+      const userId = (req as any).userId || (req.body && req.body.userId) || null;
 
-      if (!uuid) {
+      if (!userId) {
         return next({
-          log: 'uploadPlaylist: missing  uuid',
+          log: 'uploadPlaylist: missing userId',
           status: 401,
-          message: { err: 'Unauthorized: uuid not found' },
+          message: { err: 'Unauthorized: userId not found' },
         });
       }
 
@@ -73,7 +73,7 @@ const songsController: SongsController = {
         `insert into playlists (user_id, name, source)
          values ($1, $2, 'csv')
          returning id`,
-        [uuid, playlistName || 'Untitled Upload']
+        [userId, playlistName || 'Untitled Upload']
       );
       const playlistId = pl.rows[0].id;
 

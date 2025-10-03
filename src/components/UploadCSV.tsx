@@ -2,11 +2,8 @@ import React, { useMemo, useState } from 'react';
 import Papa from 'papaparse';
 import { useAuth } from '../AuthContext'; // provides { user, token }
 
-type UploadPlaylistProps = {
-  uuid: string;
-};
 
-export default function UploadPlaylist({ uuid }: UploadPlaylistProps) {
+export default function UploadPlaylist() {
   const { user, token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
@@ -14,8 +11,6 @@ export default function UploadPlaylist({ uuid }: UploadPlaylistProps) {
   const [playlistName, setPlaylistName] = useState<string>('');
 
   const preview = useMemo(() => rows.slice(0, 5), [rows]);
-
-  console.log('uuid inside uploadCSV:', uuid);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
@@ -68,9 +63,8 @@ export default function UploadPlaylist({ uuid }: UploadPlaylistProps) {
     setStatus('Uploading…');
 
     try {
-      console.log('uuid', uuid)
-      console.log('user.id', user.id);
-      console.log('rows', rows);
+      console.log(user.id);
+      console.log(rows);
       // POST to your backend. Backend should:
       // 1) Create a playlist tied to user.id
       // 2) Upsert rows into a GLOBAL tracks catalog (by track_uri or hash)
@@ -79,14 +73,14 @@ export default function UploadPlaylist({ uuid }: UploadPlaylistProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // // If your backend expects the app token, include it:
-          // ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          // If your backend expects the app token, include it:
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           playlistName: playlistName || (file ? file.name.replace(/\.csv$/i, '') : 'Untitled Upload'),
           rows,
           // IMPORTANT: Use your app user id; backend will trust token and ignore this if it verifies JWT itself.
-          uuid: uuid,
+          userId: user.id,
         }),
       });
       console.log('resp:', resp);
