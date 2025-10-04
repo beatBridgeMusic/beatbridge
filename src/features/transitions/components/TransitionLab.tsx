@@ -18,6 +18,7 @@ export const TransitionLab: React.FC = () => {
   const [customDuration, setCustomDuration] = useState<number | null>(null);
   const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastUploadTime, setLastUploadTime] = useState<number>(Date.now());
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
@@ -28,8 +29,6 @@ export const TransitionLab: React.FC = () => {
     setIsGenerating(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
       const orderedSongs = [...selectedSongs].sort((a, b) => {
         let aValue: number, bValue: number;
 
@@ -168,7 +167,7 @@ export const TransitionLab: React.FC = () => {
         <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
-      <UploadCSV></UploadCSV>
+      <UploadCSV onUploadSuccess={() => setLastUploadTime(Date.now())} />
 
       <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>
         {/* Configuration Section */}
@@ -181,7 +180,11 @@ export const TransitionLab: React.FC = () => {
               </div>
               <h2 className='text-xl font-semibold text-white'>Choose Songs from a Playlist</h2>
             </div>
-            <SongSelector selectedSongs={selectedSongs} onSongsChange={setSelectedSongs} />
+            <SongSelector
+              selectedSongs={selectedSongs}
+              onSongsChange={setSelectedSongs}
+              lastUploadTime={lastUploadTime}
+            />
           </div>
 
           {/* Step 2: Metric Selection */}

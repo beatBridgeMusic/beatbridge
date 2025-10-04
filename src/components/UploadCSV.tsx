@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import Papa from 'papaparse';
 import { useAuth } from '../AuthContext'; // provides { user, token }
 
-export default function UploadPlaylist() {
+interface Props {
+  onUploadSuccess?: () => void;
+}
+
+export default function UploadPlaylist({ onUploadSuccess }: Props) {
   const { user, token } = useAuth();
   const [file, setFile] = useState<File | null>(null);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [status, setStatus] = useState<string>('');
   const [playlistName, setPlaylistName] = useState<string>('');
+  const [fileInputKey, setFileInputKey] = useState<number>(0); // Add this to force input reset
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
@@ -16,8 +21,8 @@ export default function UploadPlaylist() {
     setStatus('');
     if (!file) return;
 
-    // Set playlist name to file name (without extension) if no custom name is set
-    if (!playlistName && file) {
+    // Always update playlist name when a new file is selected, unless user has manually entered a name
+    if (file) {
       const fileName = file.name.replace(/\.csv$/i, '').replace(/_/g, ' ');
       setPlaylistName(fileName);
     }
@@ -76,6 +81,7 @@ export default function UploadPlaylist() {
       // Optionally clear state
       setFile(null);
       setRows([]);
+      onUploadSuccess?.();
     } catch (e: any) {
       setStatus(`Upload failed: ${e.message ?? e}`);
     }
@@ -106,6 +112,7 @@ export default function UploadPlaylist() {
           <label className='block'>
             <span className='block text-sm text-white mb-1'>CSV file</span>
             <input
+              key={fileInputKey}
               type='file'
               accept='.csv,text/csv'
               onChange={handleFile}
@@ -123,6 +130,7 @@ export default function UploadPlaylist() {
                 setRows([]);
                 setStatus('');
                 setPlaylistName('');
+                setFileInputKey((key) => key + 1); // Increment key to force input reset
               }}
             >
               Reset

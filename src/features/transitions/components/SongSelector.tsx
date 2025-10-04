@@ -16,9 +16,10 @@ type PlaylistSummary = {
 interface SongSelectorProps {
   selectedSongs: DbSong[];
   onSongsChange: (songs: DbSong[]) => void;
+  lastUploadTime?: number;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange, lastUploadTime }) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
@@ -81,8 +82,8 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
           return;
         }
 
-        // Auto-select most recent playlist if no selectedId
-        if (!selectedId) {
+        // Auto-select most recent playlist if no selectedId or if lastUploadTime changed
+        if (!selectedId || lastUploadTime) {
           const mostRecentId = [...list].sort((a, b) => {
             const at = Date.parse(a.updated_at || a.created_at || '') || 0;
             const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
@@ -103,7 +104,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     return () => {
       cancelled = true;
     };
-  }, [user?.id, token, selectedId]);
+  }, [user?.id, token, selectedId, lastUploadTime]);
 
   // Fetch songs when playlist selection changes
   useEffect(() => {
@@ -138,33 +139,17 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     fetchSongs();
   }, [selectedId, token]);
 
-  // Filter and sort songs
-  const filteredAndSortedSongs = useMemo(() => {
-    // If no songs are available yet, return empty array
-    if (!availableSongs?.length) return [];
-
-    return availableSongs
-      .filter((song) => {
-        // Guard against undefined properties
-        const trackName = song.track_name?.toLowerCase() ?? '';
-        const artistName = song.artist_name_s?.toLowerCase() ?? '';
-        const searchTerm = searchFilter.toLowerCase();
-
-        return trackName.includes(searchTerm) || artistName.includes(searchTerm);
-      })
-      .sort((a, b) => {
-        if (sortBy === 'artist') {
-          // Use nullish coalescing to provide fallback values
-          const artistA = a.artist_name_s ?? '';
-          const artistB = b.artist_name_s ?? '';
-          return artistA.localeCompare(artistB);
-        }
-        // Use nullish coalescing to provide fallback values
-        const titleA = a.track_name ?? '';
-        const titleB = b.track_name ?? '';
-        return titleA.localeCompare(titleB);
-      });
-  }, [availableSongs, searchFilter, sortBy]);
+  const filteredAndSortedSongs = availableSongs
+    .filter(song => 
+      song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      song.artist_names.toLowerCase().includes(searchFilter.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === 'artist') {
+        return a.artist_names.localeCompare(b.artist_names);
+      }
+      return a.track_name.localeCompare(b.track_name);
+    });
 
   const handleSongToggle = (song: DbSong) => {
     selectedSongs.map((s) => ({ uri: s.track_uri, name: s.track_name }));
@@ -260,7 +245,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
             {selectedSongs.map((song) => (
               <div key={song.track_uri} className='selected-song-chip'>
                 <span className='song-info'>
-                  {song.track_name} - {song.artist_name_s}
+                  {song.track_name} - {song.artist_names}
                 </span>
                 <button onClick={() => handleRemoveSelectedSong(song.track_uri)} className='remove-song-btn'>
                   ✕
@@ -318,7 +303,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
                         disabled={isDisabled}
                       />
                       <div className='song-details'>
-                        <div className='song-title'>{song.track_name}</div>
+                        <div className='song-title-and-artist'>
+                          {song.track_name} • {song.artist_name_s}
+                        </div>
                         <div className='song-artist'>{song.artist_name_s}</div>
                         <div className='song-meta'>
                           {formatDuration(song.duration_ms)} • {song.genres}

@@ -6,7 +6,7 @@ export interface DbSong {
   track_uri: string;
   track_name: string;
   album_name: string;
-  artist_name_s: string;
+  artist_names: string;
   release_date: string;
   duration_ms: number;
   popularity: number;
