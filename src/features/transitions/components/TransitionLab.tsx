@@ -9,6 +9,7 @@ import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import UploadCSV from '../../../components/UploadCSV';
+import SpotifyPlayer from 'react-spotify-web-playback';
 
 export const TransitionLab: React.FC = () => {
   // State management
@@ -168,6 +169,15 @@ export const TransitionLab: React.FC = () => {
         <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
+      <SpotifyPlayer
+        token={accessToken} // your current in-memory token
+        getOAuthToken={async (cb) => {
+          const r = await fetch('/auth/token'); // your server returns a fresh access token
+          const { accessToken } = await r.json();
+          cb(accessToken);
+        }}
+        uris={['spotify:track:5VfEuwErhx6X4eaPbyBfyu']}
+      />
       <UploadCSV></UploadCSV>
 
       <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>
