@@ -269,22 +269,50 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
         {isDropdownOpen && (
           <div className='dropdown-content'>
             {/* Search and Sort Controls */}
-            <div className='dropdown-controls'>
-              <input
-                type='text'
-                placeholder='Search songs or artists...'
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                className='search-input'
-              />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
-                className='sort-select'
-              >
-                <option value='artist'>Sort by Artist</option>
-                <option value='title'>Sort by Song Title</option>
-              </select>
+            <div className='dropdown-controls space-y-3'>
+              <div className='flex items-center gap-2'>
+                <input
+                  type='text'
+                  placeholder='Search songs or artists...'
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  className='search-input'
+                />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
+                  className='sort-select'
+                >
+                  <option value='artist'>Sort by Artist</option>
+                  <option value='title'>Sort by Song Title</option>
+                </select>
+              </div>
+              <div className='flex gap-2'>
+                <button
+                  onClick={() => {
+                    const remaining = MAX_SONG_SELECTION - selectedSongs.length;
+                    const songsToAdd = filteredAndSortedSongs
+                      .filter((song) => !selectedSongs.some((s) => s.track_uri === song.track_uri))
+                      .slice(0, remaining);
+                    onSongsChange([...selectedSongs, ...songsToAdd]);
+                  }}
+                  disabled={selectedSongs.length >= MAX_SONG_SELECTION}
+                  className='px-3 py-1 rounded bg-white/10 text-sm text-white hover:bg-white/20 disabled:opacity-50'
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={() => {
+                    // Remove all songs that are currently visible in the filtered list
+                    const filteredUris = new Set(filteredAndSortedSongs.map((s) => s.track_uri));
+                    onSongsChange(selectedSongs.filter((s) => !filteredUris.has(s.track_uri)));
+                  }}
+                  disabled={selectedSongs.length === 0}
+                  className='px-3 py-1 rounded bg-white/10 text-sm text-white hover:bg-white/20 disabled:opacity-50'
+                >
+                  Deselect All
+                </button>
+              </div>
             </div>
 
             {/* Songs List */}
