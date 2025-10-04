@@ -106,7 +106,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     return () => {
       cancelled = true;
     };
-  }, [user?.id, token, lastUploadTime]); // Include lastUploadTime to trigger refresh on new uploads
+  }, [user?.id, token, lastUploadTime, selectedId]); // Include lastUploadTime to trigger refresh on new uploads
 
   // Fetch songs when playlist selection changes
   useEffect(() => {

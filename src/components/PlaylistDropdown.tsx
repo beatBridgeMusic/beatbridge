@@ -19,6 +19,7 @@ type Props = {
   token?: string | null;
 };
 
+// TODO: selecting playlist B after already including songs from playlist A should reset checkboxes and allow you to reselect probably
 export default function PlaylistDropdown({ className, onSelect, initialPlaylistId, userId, token }: Props) {
   const [playlists, setPlaylists] = useState<PlaylistSummary[]>([]);
   const [selectedId, setSelectedId] = useState('');
