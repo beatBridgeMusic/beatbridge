@@ -9,6 +9,7 @@ import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import UploadCSV from '../../../components/UploadCSV';
+import SpotifyPlayer from 'react-spotify-web-playback';
 
 export const TransitionLab: React.FC = () => {
   // State management
@@ -19,6 +20,7 @@ export const TransitionLab: React.FC = () => {
   const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastUploadTime, setLastUploadTime] = useState<number>(Date.now());
+  const [playerUris, setPlayerUris] = useState<string[]>(['spotify:track:3cLqK3LPVrTIzfENVmYLoU']);
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
@@ -104,6 +106,10 @@ export const TransitionLab: React.FC = () => {
         createdAt: new Date(),
       };
 
+      // Update the player URIs with the ordered song URIs
+      const songUris = finalSongs.map((song) => song.track_uri);
+      setPlayerUris(songUris);
+
       setOrderedPlaylist(playlist);
     } catch (error) {
       console.error('Failed to generate playlist:', error);
@@ -118,6 +124,7 @@ export const TransitionLab: React.FC = () => {
     setOrderDirection('asc');
     setCustomDuration(null);
     setOrderedPlaylist(null);
+    setPlayerUris(['spotify:track:5VfEuwErhx6X4eaPbyBfyu']);
   };
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -163,10 +170,35 @@ export const TransitionLab: React.FC = () => {
             </div>
           )}
         </div>
-        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
+        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge 🎵</h1>
         <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
+      <div className='mt-4 mb-4'>
+        <SpotifyPlayer
+          styles={{
+            activeColor: '#fff',
+            bgColor: '#333',
+            color: '#fff',
+            loaderColor: '#fff',
+            sliderColor: '#1cb954',
+            trackArtistColor: '#ccc',
+            trackNameColor: '#fff',
+            height: 80,
+          }}
+          token='BQBs3ySx4GdTA2cDnatdHJWcsY01b_hq9scVzar8T_scrCe6Wbc3b8rtJoHIQph9ThppmRuctH2ECwYN958UDzuWGmQXAhcjNoUocH1KnTJm4s_8McASFrOavopPnF-5PIoMSCrT7Flme_E0YZgIMxmuUw85ezkV7GULi5XDg2dBUJ34_2BNuRNowqlnqOPHqXSDqlZQyFO_ErD2Pss3LlNJFvQFfoAaOOiXzR8YCCijgPeg'
+          name='BeatBridge Web Player'
+          autoPlay={false}
+          play={true}
+          magnifySliderOnHover={true}
+          uris={playerUris}
+          callback={(state) => {
+            if (state.error) {
+              console.error('Spotify Player Error:', state.error);
+            }
+          }}
+        />
+      </div>
       <UploadCSV onUploadSuccess={() => setLastUploadTime(Date.now())} />
 
       <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>

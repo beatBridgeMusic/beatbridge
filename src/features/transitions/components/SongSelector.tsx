@@ -32,6 +32,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
   const [selectedId, setSelectedId] = useState('');
   const [dropdownStatus, setDropdownStatus] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
   const [dropdownError, setDropdownError] = useState('');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Sort playlists by most recent
   const sortedPlaylists = useMemo(() => {
@@ -82,18 +83,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
           return;
         }
 
-        // Get the most recent playlist ID
-        const mostRecentId = [...list].sort((a, b) => {
-          const at = Date.parse(a.updated_at || a.created_at || '') || 0;
-          const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
-          return bt - at;
-        })[0].id;
-
-        // Auto-select on first load or after a new upload
-        if (!selectedId || lastUploadTime) {
-          setSelectedId(mostRecentId);
-        }
-
+        setPlaylists(list || []);
         setDropdownStatus('ready');
       } catch (error) {
         if (cancelled) return;
@@ -106,7 +96,36 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     return () => {
       cancelled = true;
     };
-  }, [user?.id, token, lastUploadTime, selectedId]); // Include lastUploadTime to trigger refresh on new uploads
+  }, [user?.id, token, lastUploadTime]); // Only refresh on new uploads or auth changes
+
+  // Handle initial playlist selection
+  useEffect(() => {
+    if (playlists.length === 0 || hasInitialized) return;
+
+    // Only auto-select on first load
+    const mostRecentId = [...playlists].sort((a, b) => {
+      const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+      const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+      return bt - at;
+    })[0].id;
+
+    setSelectedId(mostRecentId);
+    setHasInitialized(true);
+  }, [playlists, hasInitialized]);
+
+  // Handle new uploads separately
+  useEffect(() => {
+    if (!lastUploadTime || playlists.length === 0) return;
+    
+    // When a new upload happens, switch to the most recent playlist
+    const mostRecentId = [...playlists].sort((a, b) => {
+      const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+      const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+      return bt - at;
+    })[0].id;
+
+    setSelectedId(mostRecentId);
+  }, [lastUploadTime, playlists]);
 
   // Fetch songs when playlist selection changes
   useEffect(() => {
