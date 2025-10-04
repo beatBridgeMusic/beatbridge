@@ -223,7 +223,6 @@ export const TransitionLab: React.FC = () => {
           {/* Generate Button */}
           {canGenerate && (
             <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30'>
-              <h3 className='text-2xl font-bold text-white mb-4 text-center'>Ready to Create Your Beat Bridge!</h3>
               <button
                 onClick={handleGeneratePlaylist}
                 disabled={isGenerating}
