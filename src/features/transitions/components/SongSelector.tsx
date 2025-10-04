@@ -1,68 +1,179 @@
 /// src/features/transitions/components/SongSelector.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { DbSong } from '../types';
 import { MAX_SONG_SELECTION, MIN_SONG_SELECTION } from '../constants';
+
+import { useAuth } from '../../../AuthContext';
+
+type PlaylistSummary = {
+  id: string;
+  name: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+  track_count?: number | null;
+};
 
 interface SongSelectorProps {
   selectedSongs: DbSong[];
   onSongsChange: (songs: DbSong[]) => void;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({
-  selectedSongs,
-  onSongsChange,
-}) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState<'artist' | 'title'>('artist');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, token } = useAuth();
 
-  // Mock data - will be replaced with API call
+  // Playlist dropdown state
+  const [playlists, setPlaylists] = useState<PlaylistSummary[]>([]);
+  const [selectedId, setSelectedId] = useState('');
+  const [dropdownStatus, setDropdownStatus] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
+  const [dropdownError, setDropdownError] = useState('');
+
+  // Sort playlists by most recent
+  const sortedPlaylists = useMemo(() => {
+    return [...playlists].sort((a, b) => {
+      const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+      const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+      return bt - at;
+    });
+  }, [playlists]);
+
+  // Fetch playlists
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchPlaylists = async () => {
+      if (!user?.id) return;
+
+      setDropdownStatus('loading');
+      setDropdownError('');
+      try {
+        const resp = await fetch(`http://localhost:3001/songs/playlists/${user.id}`, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
+        if (!resp.ok) {
+          let msg = `HTTP ${resp.status}`;
+          try {
+            const j = await resp.json();
+            if (j?.error) msg = j.error;
+          } catch {
+            throw new Error(msg);
+          }
+        }
+
+        const data = await resp.json();
+        const list = Array.isArray(data) ? data : data.playlists;
+
+        if (cancelled) return;
+
+        setPlaylists(list || []);
+
+        if (!list || list.length === 0) {
+          setSelectedId('');
+          setDropdownStatus('empty');
+          return;
+        }
+
+        // Auto-select most recent playlist if no selectedId
+        if (!selectedId) {
+          const mostRecentId = [...list].sort((a, b) => {
+            const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+            const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+            return bt - at;
+          })[0].id;
+          setSelectedId(mostRecentId);
+        }
+
+        setDropdownStatus('ready');
+      } catch (error) {
+        if (cancelled) return;
+        setDropdownError(error instanceof Error ? error.message : 'Failed to load playlists');
+        setDropdownStatus('error');
+      }
+    };
+
+    fetchPlaylists();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, token, selectedId]);
+
+  // Fetch songs when playlist selection changes
   useEffect(() => {
     const fetchSongs = async () => {
       setIsLoading(true);
       try {
-        // TODO: Replace with better API call? or maybe it's too much work to refactor the frontend
-        const response = await fetch('http://localhost:3001/songs/all');
+        if (!selectedId) {
+          setAvailableSongs([]);
+          return;
+        }
+
+        const response = await fetch(`http://localhost:3001/songs/playlistTracks/${selectedId}`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+
         if (!response.ok) {
-          throw new Error(
-            `Error fetching all songs, server returned ${response.status}`
-          );
+          throw new Error(`Error fetching playlist songs, server returned ${response.status}`);
         }
         const data = await response.json();
 
         setAvailableSongs(data);
       } catch (error) {
         console.error('Failed to fetch songs:', error);
+        setAvailableSongs([]);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchSongs();
-  }, []);
+  }, [selectedId, token]);
 
   // Filter and sort songs
-  const filteredAndSortedSongs = availableSongs
-    .filter(
-      (song) =>
-        song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-        song.artist_name_s.toLowerCase().includes(searchFilter.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'artist') {
-        return a.artist_name_s.localeCompare(b.artist_name_s);
-      }
-      return a.track_name.localeCompare(b.track_name);
-    });
+  const filteredAndSortedSongs = useMemo(() => {
+    // If no songs are available yet, return empty array
+    if (!availableSongs?.length) return [];
+
+    return availableSongs
+      .filter((song) => {
+        // Guard against undefined properties
+        const trackName = song.track_name?.toLowerCase() ?? '';
+        const artistName = song.artist_name_s?.toLowerCase() ?? '';
+        const searchTerm = searchFilter.toLowerCase();
+
+        return trackName.includes(searchTerm) || artistName.includes(searchTerm);
+      })
+      .sort((a, b) => {
+        if (sortBy === 'artist') {
+          // Use nullish coalescing to provide fallback values
+          const artistA = a.artist_name_s ?? '';
+          const artistB = b.artist_name_s ?? '';
+          return artistA.localeCompare(artistB);
+        }
+        // Use nullish coalescing to provide fallback values
+        const titleA = a.track_name ?? '';
+        const titleB = b.track_name ?? '';
+        return titleA.localeCompare(titleB);
+      });
+  }, [availableSongs, searchFilter, sortBy]);
 
   const handleSongToggle = (song: DbSong) => {
-    const isSelected = selectedSongs.some((s) => s.id === song.id);
+    selectedSongs.map((s) => ({ uri: s.track_uri, name: s.track_name }));
+
+    const isSelected = selectedSongs.some((s) => s.track_uri === song.track_uri);
 
     if (isSelected) {
       // Remove song
-      onSongsChange(selectedSongs.filter((s) => s.id !== song.id));
+      onSongsChange(selectedSongs.filter((s) => s.track_uri !== song.track_uri));
     } else {
       // Add song (if under limit)
       if (selectedSongs.length < MAX_SONG_SELECTION) {
@@ -71,8 +182,8 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     }
   };
 
-  const handleRemoveSelectedSong = (songId: string) => {
-    onSongsChange(selectedSongs.filter((s) => s.id !== songId));
+  const handleRemoveSelectedSong = (trackUri: string) => {
+    onSongsChange(selectedSongs.filter((s) => s.track_uri !== trackUri));
   };
 
   const formatDuration = (ms: number) => {
@@ -87,10 +198,56 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
   return (
     <div className='song-selector'>
+      <div className='w-full max-w-3xl mx-auto px-4 py-6'>
+        <div className='mb-4'>
+          <label className='block mb-2 text-sm text-white'>Select a playlist</label>
+
+          <div className='flex items-center gap-2'>
+            <select
+              value={selectedId}
+              onChange={(e) => {
+                const id = e.target.value;
+                // console.log('e.target', e.target);
+                setSelectedId(id);
+                // const selectedPlaylist = sortedPlaylists.find((p) => p.id === id);
+                // if (selectedPlaylist) {
+                //   console.log('Selected playlist:', selectedPlaylist);
+                // }
+              }}
+              disabled={dropdownStatus === 'loading' || dropdownStatus === 'empty' || dropdownStatus === 'error'}
+              className='w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white disabled:opacity-50'
+            >
+              {dropdownStatus === 'loading' && <option value=''>Loading your playlists…</option>}
+              {dropdownStatus === 'empty' && <option value=''>No playlists yet — upload a CSV to begin</option>}
+              {dropdownStatus === 'error' && <option value=''>Couldn't load playlists</option>}
+              {dropdownStatus === 'ready' &&
+                sortedPlaylists.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                    {typeof p.track_count === 'number' ? ` (${p.track_count} tracks)` : ''}
+                  </option>
+                ))}
+            </select>
+
+            {dropdownStatus === 'loading' && <span className='text-xs text-white/70'>Loading…</span>}
+            {dropdownStatus === 'error' && <span className='text-xs text-red-300'>Error</span>}
+          </div>
+
+          {dropdownError && <p className='mt-2 text-xs text-red-300'>{dropdownError}</p>}
+        </div>
+
+        {selectedId ? (
+          <p className='text-white'>
+            Selected: <span className='font-medium'>{sortedPlaylists.find((p) => p.id === selectedId)?.name}</span>
+          </p>
+        ) : (
+          <p className='text-white/70'>Pick a playlist to continue.</p>
+        )}
+      </div>
       {/* ✅ REMOVED: <h3>Choose Your Songs</h3> - now handled by step card header */}
       {/* 🟢 CHANGED: Added step-description class, removed duplicate heading */}
       <p className='step-description'>
-        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database
+        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from your playlist
       </p>
 
       {/* Selected Songs Display */}
@@ -101,14 +258,11 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
           </h4>
           <div className='selected-songs-list'>
             {selectedSongs.map((song) => (
-              <div key={song.id} className='selected-song-chip'>
+              <div key={song.track_uri} className='selected-song-chip'>
                 <span className='song-info'>
                   {song.track_name} - {song.artist_name_s}
                 </span>
-                <button
-                  onClick={() => handleRemoveSelectedSong(song.id)}
-                  className='remove-song-btn'
-                >
+                <button onClick={() => handleRemoveSelectedSong(song.track_uri)} className='remove-song-btn'>
                   ✕
                 </button>
               </div>
@@ -119,10 +273,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
       {/* Song Selection Dropdown */}
       <div className='song-dropdown'>
-        <button
-          className='dropdown-toggle'
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
+        <button className='dropdown-toggle' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           Add Songs ({filteredAndSortedSongs.length} available)
           <span className={`arrow ${isDropdownOpen ? 'up' : 'down'}`}>▼</span>
         </button>
@@ -140,9 +291,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
               />
               <select
                 value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as 'artist' | 'title')
-                }
+                onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
                 className='sort-select'
               >
                 <option value='artist'>Sort by Artist</option>
@@ -153,16 +302,13 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             {/* Songs List */}
             <div className='songs-list'>
               {filteredAndSortedSongs.map((song) => {
-                const isSelected = selectedSongs.some((s) => s.id === song.id);
-                const isDisabled =
-                  !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
+                const isSelected = selectedSongs.some((s) => s.track_uri === song.track_uri);
+                const isDisabled = !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
 
                 return (
                   <div
-                    key={song.id}
-                    className={`song-item ${isSelected ? 'selected' : ''} ${
-                      isDisabled ? 'disabled' : ''
-                    }`}
+                    key={song.track_uri}
+                    className={`song-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
                   >
                     <label className='song-checkbox'>
                       <input
@@ -184,9 +330,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
               })}
 
               {filteredAndSortedSongs.length === 0 && (
-                <div className='no-results'>
-                  No songs found matching your search
-                </div>
+                <div className='no-results'>No songs found matching your search</div>
               )}
             </div>
           </div>

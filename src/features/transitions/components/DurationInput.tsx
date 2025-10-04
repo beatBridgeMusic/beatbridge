@@ -9,11 +9,7 @@ interface DurationInputProps {
   onDurationChange: (duration: number | null) => void;
 }
 
-export const DurationInput: React.FC<DurationInputProps> = ({
-  selectedSongs,
-  customDuration,
-  onDurationChange
-}) => {
+export const DurationInput: React.FC<DurationInputProps> = ({ selectedSongs, customDuration, onDurationChange }) => {
   // Calculate total duration of selected songs
   const totalSelectedDuration = selectedSongs.reduce((total, song) => {
     return total + song.duration_ms;
@@ -25,9 +21,7 @@ export const DurationInput: React.FC<DurationInputProps> = ({
     if (minutes >= 60) {
       const hours = Math.floor(minutes / 60);
       const remainingMinutes = minutes % 60;
-      return remainingMinutes > 0 
-        ? `${hours}h ${remainingMinutes}m`
-        : `${hours}h`;
+      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
     }
     return `${minutes}m`;
   };
@@ -57,18 +51,18 @@ export const DurationInput: React.FC<DurationInputProps> = ({
       
       {/* Current Selection Info */}
       {selectedSongs.length > 0 && (
-        <div className="current-duration-info">
-          <p className="selected-duration">
+        <div className='current-duration-info'>
+          <p className='selected-duration'>
             Your {selectedSongs.length} selected songs total: <strong>{formatDuration(totalSelectedMinutes)}</strong>
           </p>
         </div>
       )}
 
       {/* Duration Options */}
-      <div className="duration-options">
+      <div className='duration-options'>
         <h4>Quick Options:</h4>
-        <div className="preset-buttons">
-          {DURATION_OPTIONS.map(option => (
+        <div className='preset-buttons'>
+          {DURATION_OPTIONS.map((option) => (
             <button
               key={option.value}
               className={`preset-btn ${customDuration === option.value ? 'selected' : ''}`}
@@ -81,25 +75,21 @@ export const DurationInput: React.FC<DurationInputProps> = ({
       </div>
 
       {/* Custom Duration Input */}
-      <div className="custom-duration">
+      <div className='custom-duration'>
         <h4>Custom Duration:</h4>
-        <div className="custom-input-group">
+        <div className='custom-input-group'>
           <input
-            type="number"
-            min="5"
-            max="300"
+            type='number'
+            min='5'
+            max='300'
             value={customDuration || ''}
             onChange={handleCustomChange}
-            placeholder="Enter minutes..."
-            className="custom-duration-input"
+            placeholder='Enter minutes...'
+            className='custom-duration-input'
           />
-          <span className="input-suffix">minutes</span>
+          <span className='input-suffix'>minutes</span>
           {customDuration && (
-            <button 
-              onClick={handleClearDuration}
-              className="clear-duration-btn"
-              title="Clear duration limit"
-            >
+            <button onClick={handleClearDuration} className='clear-duration-btn' title='Clear duration limit'>
               ✕
             </button>
           )}
@@ -108,19 +98,19 @@ export const DurationInput: React.FC<DurationInputProps> = ({
 
       {/* Duration Effect Explanation */}
       {customDuration && (
-        <div className="duration-explanation">
+        <div className='duration-explanation'>
           {customDuration < totalSelectedMinutes ? (
-            <div className="warning">
+            <div className='warning'>
               <p>⚠️ Target duration is shorter than your selected songs.</p>
               <p>We'll trim the playlist to fit {formatDuration(customDuration)}.</p>
             </div>
           ) : customDuration > totalSelectedMinutes ? (
-            <div className="info">
+            <div className='info'>
               <p>ℹ️ Target duration is longer than your selected songs.</p>
               <p>We'll repeat songs to reach {formatDuration(customDuration)}.</p>
             </div>
           ) : (
-            <div className="success">
+            <div className='success'>
               <p>✅ Perfect! Your songs exactly match {formatDuration(customDuration)}.</p>
             </div>
           )}
@@ -129,7 +119,7 @@ export const DurationInput: React.FC<DurationInputProps> = ({
 
       {/* No Duration Set */}
       {!customDuration && (
-        <div className="no-duration-info">
+        <div className='no-duration-info'>
           <p>No duration limit set - we'll use all your selected songs in order.</p>
         </div>
       )}

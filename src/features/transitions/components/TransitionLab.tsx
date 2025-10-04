@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import FloatingNotes from '../../../components/FloatingNotes';
 import ChatAssistant from '../../../components/ChatAssistant';
 
+import UploadCSV from '../../../components/UploadCSV';
+
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
@@ -167,17 +169,19 @@ export const TransitionLab: React.FC = () => {
         </p>
       </header>
 
+      <UploadCSV></UploadCSV>
+
       <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>
         {/* Configuration Section */}
         <div className='space-y-6'>
           {/* Step 1: Song Selection */}
           <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
             <div className='flex items-center gap-4 mb-4'>
-              <div className='bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
+              <div className='bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
                 1
               </div>
               <h2 className='text-xl font-semibold text-white'>
-                Choose Your Songs
+                Choose Songs from a Playlist
               </h2>
             </div>
             <SongSelector
@@ -194,7 +198,7 @@ export const TransitionLab: React.FC = () => {
                   2
                 </div>
                 <h2 className='text-xl font-semibold text-white'>
-                  Choose Your Flow
+                  Choose Your Flow Metric
                 </h2>
               </div>
               <MetricSelector
@@ -231,9 +235,6 @@ export const TransitionLab: React.FC = () => {
           {/* Generate Button */}
           {canGenerate && (
             <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30'>
-              <h3 className='text-2xl font-bold text-white mb-4 text-center'>
-                Ready to Create Your Beat Bridge!
-              </h3>
               <button
                 onClick={handleGeneratePlaylist}
                 disabled={isGenerating}

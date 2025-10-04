@@ -8,11 +8,7 @@ interface OrderedPlaylistProps {
   onCreateNew: () => void;
 }
 
-export const OrderedPlaylist: React.FC<OrderedPlaylistProps> = ({
-  playlist,
-  isGenerating,
-  onCreateNew
-}) => {
+export const OrderedPlaylist: React.FC<OrderedPlaylistProps> = ({ playlist, isGenerating, onCreateNew }) => {
   const formatDuration = (ms: number) => {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -64,7 +60,7 @@ export const OrderedPlaylist: React.FC<OrderedPlaylistProps> = ({
       valence: 'Mood',
       danceability: 'Danceability',
       loudness: 'Loudness',
-      popularity: 'Popularity'
+      popularity: 'Popularity',
     };
     return labels[metric];
   };
