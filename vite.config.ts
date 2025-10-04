@@ -13,8 +13,4 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
-  // add Vitest configuration
-  test: {
-    environment: 'jsdom',
-  }
 });
