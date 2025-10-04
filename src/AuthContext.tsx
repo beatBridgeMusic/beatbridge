@@ -1,7 +1,7 @@
 import React, { createContext, useState, ReactNode, useContext } from 'react';
 /* eslint-disable react-refresh/only-export-components */
 import { useEffect } from 'react';
-interface User {
+export interface User {
   id: string;
   email: string;
   username?: string;

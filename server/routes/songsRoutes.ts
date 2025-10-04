@@ -7,12 +7,24 @@ router.get('/', songsController.getSongs, (req, res) => {
   res.status(200).json(res.locals.songsList);
 });
 
-router.get('/all', songsController.getAllSongs, (req, res) => {
+router.get('/playlists/:userId', songsController.getPlaylists, (req, res) => {
+  res.status(200).json(res.locals.playlists);
+});
+
+router.get('/playlistTracks/:playlistId', songsController.getPlaylistTracks, (req, res) => {
+  res.status(200).json(res.locals.playlistTracks);
+});
+
+router.get('/demo', songsController.getDemoSongs, (req, res) => {
   res.status(200).json(res.locals.songsList);
 });
 
 router.get('/trackNames', songsController.getAllTrackNames, (req, res) => {
   res.status(200).json(res.locals.songsList);
+});
+
+router.post('/upload', songsController.uploadPlaylist, (req, res) => {
+  res.status(201).json(res.locals.uploadResult);
 });
 
 export default router;

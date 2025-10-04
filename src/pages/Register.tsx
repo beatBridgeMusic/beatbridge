@@ -47,6 +47,7 @@ const Register = () => {
       <div className='flex justify-center items-center h-screen'>
         <div className='shadow-lg px-8 py-5 border w-96 rounded-lg bg-white/20 text-black backdrop-blur-lg'>
           <h2 className='text-lg font-bold mb-4'>Register</h2>
+
           <form onSubmit={handleSubmit}>
             <div className='mb-4'>
               <label htmlFor='username' className='block text-gray-700'>
@@ -114,7 +115,7 @@ const Register = () => {
             <span className='text-base font-medium '>Sign Up With Google</span>
           </button>
           <div className='text-center my-3'>
-            <span>Already have account?</span>
+            <span>Already have an account?</span>
             <Link
               to='/login'
               className='text-blue-900 mx-3 hover:text-green-600 transition-colors duration-200'

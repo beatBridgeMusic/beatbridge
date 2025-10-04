@@ -14,20 +14,20 @@ export const MetricSelector: React.FC<MetricSelectorProps> = ({
   selectedMetric,
   onMetricChange,
   orderDirection,
-  onDirectionChange
+  onDirectionChange,
 }) => {
   const getDirectionLabel = (metric: OrderingMetric | null, direction: 'asc' | 'desc') => {
     if (!metric) return direction === 'asc' ? 'Low to High' : 'High to Low';
-    
+
     const directionLabels = {
       tempo: { asc: 'Slow to Fast', desc: 'Fast to Slow' },
       energy: { asc: 'Calm to Energetic', desc: 'Energetic to Calm' },
       valence: { asc: 'Sad to Happy', desc: 'Happy to Sad' },
       danceability: { asc: 'Chill to Dance', desc: 'Dance to Chill' },
       loudness: { asc: 'Quiet to Loud', desc: 'Loud to Quiet' },
-      popularity: { asc: 'Hidden Gems to Hits', desc: 'Hits to Hidden Gems' }
+      popularity: { asc: 'Hidden Gems to Hits', desc: 'Hits to Hidden Gems' },
     };
-    
+
     return directionLabels[metric][direction];
   };
 
@@ -43,10 +43,10 @@ export const MetricSelector: React.FC<MetricSelectorProps> = ({
           id="metric-dropdown"
           value={selectedMetric || ''} 
           onChange={(e) => onMetricChange(e.target.value as OrderingMetric)}
-          className="metric-dropdown"
+          className='metric-dropdown'
         >
-          <option value="">Select a metric...</option>
-          {ORDERING_METRICS.map(metric => (
+          <option value=''>Select a metric...</option>
+          {ORDERING_METRICS.map((metric) => (
             <option key={metric.value} value={metric.value}>
               {metric.label}
             </option>
@@ -55,38 +55,34 @@ export const MetricSelector: React.FC<MetricSelectorProps> = ({
       </div>
 
       {selectedMetric && (
-        <div className="metric-details">
-          <div className="metric-description">
-            <p>{ORDERING_METRICS.find(m => m.value === selectedMetric)?.description}</p>
+        <div className='metric-details'>
+          <div className='metric-description'>
+            <p>{ORDERING_METRICS.find((m) => m.value === selectedMetric)?.description}</p>
           </div>
-          
-          <div className="direction-selection">
+
+          <div className='direction-selection'>
             <label>Direction:</label>
-            <div className="direction-options">
-              <label className="direction-option">
+            <div className='direction-options'>
+              <label className='direction-option'>
                 <input
-                  type="radio"
-                  name="direction"
-                  value="asc"
+                  type='radio'
+                  name='direction'
+                  value='asc'
                   checked={orderDirection === 'asc'}
                   onChange={() => onDirectionChange('asc')}
                 />
-                <span className="direction-label">
-                  {getDirectionLabel(selectedMetric, 'asc')}
-                </span>
+                <span className='direction-label'>{getDirectionLabel(selectedMetric, 'asc')}</span>
               </label>
-              
-              <label className="direction-option">
+
+              <label className='direction-option'>
                 <input
-                  type="radio"
-                  name="direction"
-                  value="desc"
+                  type='radio'
+                  name='direction'
+                  value='desc'
                   checked={orderDirection === 'desc'}
                   onChange={() => onDirectionChange('desc')}
                 />
-                <span className="direction-label">
-                  {getDirectionLabel(selectedMetric, 'desc')}
-                </span>
+                <span className='direction-label'>{getDirectionLabel(selectedMetric, 'desc')}</span>
               </label>
             </div>
           </div>
@@ -94,15 +90,11 @@ export const MetricSelector: React.FC<MetricSelectorProps> = ({
       )}
 
       {!selectedMetric && (
-        <div className="metric-preview">
+        <div className='metric-preview'>
           <h4>Available Metrics:</h4>
-          <div className="metrics-grid">
-            {ORDERING_METRICS.map(metric => (
-              <div 
-                key={metric.value} 
-                className="metric-card"
-                onClick={() => onMetricChange(metric.value)}
-              >
+          <div className='metrics-grid'>
+            {ORDERING_METRICS.map((metric) => (
+              <div key={metric.value} className='metric-card' onClick={() => onMetricChange(metric.value)}>
                 <h5>{metric.label}</h5>
                 <p>{metric.description}</p>
               </div>
