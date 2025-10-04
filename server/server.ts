@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 import songsRoutes from './routes/songsRoutes.js';
 import authRouter from './routes/authRoutes';
+import chartRoutes from './routes/chartRoutes.js';
 
 console.log('SUPABASE_URL:', process.env.SUPABASE_URL);
 console.log('SERVICEROLE_KEY exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
@@ -25,6 +26,8 @@ app.use(
 
 app.use('/songs', songsRoutes);
 app.use('/auth', authRouter);
+app.use('/charts', chartRoutes);
+app.use('/openai', chartRoutes);
 
 // catch-all route handler for any requests to an unknown route
 app.use((req, res) => {

@@ -13,6 +13,7 @@ import { OrderedPlaylist } from './OrderedPlaylist.js';
 import { useAuth } from '../../../AuthContext';
 import { useNavigate } from 'react-router-dom';
 import FloatingNotes from '../../../components/FloatingNotes';
+import ChatAssistant from '../../../components/ChatAssistant';
 
 export const TransitionLab: React.FC = () => {
   // State management
@@ -253,6 +254,7 @@ export const TransitionLab: React.FC = () => {
             isGenerating={isGenerating}
             onCreateNew={handleCreateNew}
           />
+          <ChatAssistant />
         </div>
       </div>
     </div>
