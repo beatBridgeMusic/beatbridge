@@ -16,11 +16,13 @@ type PlaylistSummary = {
 interface SongSelectorProps {
   selectedSongs: DbSong[];
   onSongsChange: (songs: DbSong[]) => void;
+  lastUploadTime?: number;
 }
 
 export const SongSelector: React.FC<SongSelectorProps> = ({
   selectedSongs,
   onSongsChange,
+  lastUploadTime,
 }) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +38,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     'idle' | 'loading' | 'ready' | 'empty' | 'error'
   >('idle');
   const [dropdownError, setDropdownError] = useState('');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Sort playlists by most recent
   const sortedPlaylists = useMemo(() => {
@@ -89,16 +92,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
           return;
         }
 
-        // Auto-select most recent playlist if no selectedId
-        if (!selectedId) {
-          const mostRecentId = [...list].sort((a, b) => {
-            const at = Date.parse(a.updated_at || a.created_at || '') || 0;
-            const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
-            return bt - at;
-          })[0].id;
-          setSelectedId(mostRecentId);
-        }
-
+        setPlaylists(list || []);
         setDropdownStatus('ready');
       } catch (error) {
         if (cancelled) return;
@@ -113,7 +107,36 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [user?.id, token, selectedId]);
+  }, [user?.id, token, lastUploadTime]); // Only refresh on new uploads or auth changes
+
+  // Handle initial playlist selection
+  useEffect(() => {
+    if (playlists.length === 0 || hasInitialized) return;
+
+    // Only auto-select on first load
+    const mostRecentId = [...playlists].sort((a, b) => {
+      const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+      const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+      return bt - at;
+    })[0].id;
+
+    setSelectedId(mostRecentId);
+    setHasInitialized(true);
+  }, [playlists, hasInitialized]);
+
+  // Handle new uploads separately
+  useEffect(() => {
+    if (!lastUploadTime || playlists.length === 0) return;
+
+    // When a new upload happens, switch to the most recent playlist
+    const mostRecentId = [...playlists].sort((a, b) => {
+      const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+      const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+      return bt - at;
+    })[0].id;
+
+    setSelectedId(mostRecentId);
+  }, [lastUploadTime, playlists]);
 
   // Fetch songs when playlist selection changes
   useEffect(() => {
@@ -153,35 +176,18 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
     fetchSongs();
   }, [selectedId, token]);
 
-  // Filter and sort songs
-  const filteredAndSortedSongs = useMemo(() => {
-    // If no songs are available yet, return empty array
-    if (!availableSongs?.length) return [];
-
-    return availableSongs
-      .filter((song) => {
-        // Guard against undefined properties
-        const trackName = song.track_name?.toLowerCase() ?? '';
-        const artistName = song.artist_name_s?.toLowerCase() ?? '';
-        const searchTerm = searchFilter.toLowerCase();
-
-        return (
-          trackName.includes(searchTerm) || artistName.includes(searchTerm)
-        );
-      })
-      .sort((a, b) => {
-        if (sortBy === 'artist') {
-          // Use nullish coalescing to provide fallback values
-          const artistA = a.artist_name_s ?? '';
-          const artistB = b.artist_name_s ?? '';
-          return artistA.localeCompare(artistB);
-        }
-        // Use nullish coalescing to provide fallback values
-        const titleA = a.track_name ?? '';
-        const titleB = b.track_name ?? '';
-        return titleA.localeCompare(titleB);
-      });
-  }, [availableSongs, searchFilter, sortBy]);
+  const filteredAndSortedSongs = availableSongs
+    .filter(
+      (song) =>
+        song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+        song.artist_names.toLowerCase().includes(searchFilter.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (sortBy === 'artist') {
+        return a.artist_names.localeCompare(b.artist_names);
+      }
+      return a.track_name.localeCompare(b.track_name);
+    });
 
   const handleSongToggle = (song: DbSong) => {
     selectedSongs.map((s) => ({ uri: s.track_uri, name: s.track_name }));
@@ -307,7 +313,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             {selectedSongs.map((song) => (
               <div key={song.track_uri} className='selected-song-chip'>
                 <span className='song-info'>
-                  {song.track_name} - {song.artist_name_s}
+                  {song.track_name} - {song.artist_names}
                 </span>
                 <button
                   onClick={() => handleRemoveSelectedSong(song.track_uri)}
@@ -334,24 +340,63 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
         {isDropdownOpen && (
           <div className='dropdown-content'>
             {/* Search and Sort Controls */}
-            <div className='dropdown-controls'>
-              <input
-                type='text'
-                placeholder='Search songs or artists...'
-                value={searchFilter}
-                onChange={(e) => setSearchFilter(e.target.value)}
-                className='search-input'
-              />
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as 'artist' | 'title')
-                }
-                className='sort-select'
-              >
-                <option value='artist'>Sort by Artist</option>
-                <option value='title'>Sort by Song Title</option>
-              </select>
+            <div className='dropdown-controls space-y-3'>
+              <div className='flex items-center gap-2'>
+                <input
+                  type='text'
+                  placeholder='Search songs or artists...'
+                  value={searchFilter}
+                  onChange={(e) => setSearchFilter(e.target.value)}
+                  className='search-input'
+                />
+                <select
+                  value={sortBy}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as 'artist' | 'title')
+                  }
+                  className='sort-select'
+                >
+                  <option value='artist'>Sort by Artist</option>
+                  <option value='title'>Sort by Song Title</option>
+                </select>
+              </div>
+              <div className='flex gap-2'>
+                <button
+                  onClick={() => {
+                    const remaining = MAX_SONG_SELECTION - selectedSongs.length;
+                    const songsToAdd = filteredAndSortedSongs
+                      .filter(
+                        (song) =>
+                          !selectedSongs.some(
+                            (s) => s.track_uri === song.track_uri
+                          )
+                      )
+                      .slice(0, remaining);
+                    onSongsChange([...selectedSongs, ...songsToAdd]);
+                  }}
+                  disabled={selectedSongs.length >= MAX_SONG_SELECTION}
+                  className='px-3 py-1 rounded bg-white/10 text-sm text-white hover:bg-white/20 disabled:opacity-50'
+                >
+                  Select All
+                </button>
+                <button
+                  onClick={() => {
+                    // Remove all songs that are currently visible in the filtered list
+                    const filteredUris = new Set(
+                      filteredAndSortedSongs.map((s) => s.track_uri)
+                    );
+                    onSongsChange(
+                      selectedSongs.filter(
+                        (s) => !filteredUris.has(s.track_uri)
+                      )
+                    );
+                  }}
+                  disabled={selectedSongs.length === 0}
+                  className='px-3 py-1 rounded bg-white/10 text-sm text-white hover:bg-white/20 disabled:opacity-50'
+                >
+                  Deselect All
+                </button>
+              </div>
             </div>
 
             {/* Songs List */}
@@ -379,8 +424,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                         className='w-5 h-5 accent-blue-500 cursor-pointer shrink-0 mt-[2px]'
                       />
                       <div className='song-details'>
-                        <div className='song-title'>{song.track_name}</div>
-                        <div className='song-artist'>{song.artist_name_s}</div>
+                        <div className='song-title-and-artist'>
+                          {song.track_name} • {song.artist_names}
+                        </div>
                         <div className='song-meta'>
                           {formatDuration(song.duration_ms)} • {song.genres}
                         </div>

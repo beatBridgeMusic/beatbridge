@@ -6,7 +6,7 @@ export const mockSongs: DbSong[] = [
     track_uri: 'spotify:track:abc123',
     track_name: 'High Energy Track',
     album_name: 'Album A',
-    artist_name_s: 'Artist One',
+    artist_names: 'Artist One',
     release_date: '2023-01-15',
     duration_ms: 180000, // 3 minutes
     popularity: 80,
@@ -35,7 +35,7 @@ export const mockSongs: DbSong[] = [
     track_uri: 'spotify:track:def456',
     track_name: 'Medium Energy Track',
     album_name: 'Album B',
-    artist_name_s: 'Artist Two',
+    artist_names: 'Artist Two',
     release_date: '2023-03-20',
     duration_ms: 210000, // 3.5 minutes
     popularity: 60,
@@ -93,7 +93,7 @@ export const mockSongs: DbSong[] = [
     track_uri: 'spotify:track:jkl012',
     track_name: 'Fast Track',
     album_name: 'Album D',
-    artist_name_s: 'Artist Four',
+    artist_names: 'Artist Four',
     release_date: '2023-09-05',
     duration_ms: 150000, // 2.5 minutes
     popularity: 90,

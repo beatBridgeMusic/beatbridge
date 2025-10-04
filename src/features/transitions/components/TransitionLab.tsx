@@ -16,6 +16,7 @@ import FloatingNotes from '../../../components/FloatingNotes';
 import ChatAssistant from '../../../components/ChatAssistant';
 
 import UploadCSV from '../../../components/UploadCSV';
+import SpotifyPlayer from 'react-spotify-web-playback';
 
 export const TransitionLab: React.FC = () => {
   // State management
@@ -28,6 +29,8 @@ export const TransitionLab: React.FC = () => {
   const [orderedPlaylist, setOrderedPlaylist] =
     useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastUploadTime, setLastUploadTime] = useState<number>(Date.now());
+  const [playerUris, setPlayerUris] = useState<string[]>([]);
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
@@ -39,8 +42,6 @@ export const TransitionLab: React.FC = () => {
     setIsGenerating(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
       const orderedSongs = [...selectedSongs].sort((a, b) => {
         let aValue: number, bValue: number;
 
@@ -118,6 +119,10 @@ export const TransitionLab: React.FC = () => {
         createdAt: new Date(),
       };
 
+      // Update the player URIs with the ordered song URIs
+      const songUris = finalSongs.map((song) => song.track_uri);
+      setPlayerUris(songUris);
+
       setOrderedPlaylist(playlist);
     } catch (error) {
       console.error('Failed to generate playlist:', error);
@@ -132,6 +137,7 @@ export const TransitionLab: React.FC = () => {
     setOrderDirection('asc');
     setCustomDuration(null);
     setOrderedPlaylist(null);
+    setPlayerUris(['spotify:track:5VfEuwErhx6X4eaPbyBfyu']);
   };
   const navigate = useNavigate();
   const handleLogout = () => {
@@ -163,13 +169,47 @@ export const TransitionLab: React.FC = () => {
             </div>
           )}
         </div>
-        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
-        <p className='text-lg font-light'>
-          Order your customized playlist by any metric for the perfect flow
-        </p>
+        <div className='flex flex-col items-center gap-4'>
+          <img
+            src='/beatbridge_gradient.png'
+            alt='BeatBridge Logo'
+            className='w-50 h-50 object-contain'
+          />
+          <h1 className='text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-orange-600 text-transparent bg-clip-text'>
+            🎵 BeatBridge 🎵
+          </h1>
+          <p className='text-lg font-light'>
+            Order your customized playlist by any metric for the perfect flow
+          </p>
+        </div>
       </header>
 
-      <UploadCSV></UploadCSV>
+      <div className='mt-4 mb-4'>
+        <SpotifyPlayer
+          styles={{
+            activeColor: '#fff',
+            bgColor: '#333',
+            color: '#fff',
+            loaderColor: '#fff',
+            sliderColor: '#1cb954',
+            trackArtistColor: '#ccc',
+            trackNameColor: '#fff',
+            height: 80,
+          }}
+          token='BQAV_CtBTXtwQuBxNkgH8SIse_Du0ipduItydlPgBZdSWThAKtkz4FoMkuiDJqwrEPzU-GfAiBb8CWcUP17nzEnrbzquJJKbLMesnKx2MpblAJPP8qSoVs8PLLhECTBqo8MRT0hM4Vtuxhnk98S0B9KIChIxGueXBTQGOZU0RpvtQ_BBed3gdA7bLws0n2A6zgH8OzA7TK3DY52edTp3hyaK51uluDHdTrD5Jsf48RHftfUf'
+          name='BeatBridge Web Player'
+          autoPlay={false}
+          play={true}
+          magnifySliderOnHover={true}
+          uris={playerUris}
+          callback={(state) => {
+            if (state.error) {
+              console.error('Spotify Player Error:', state.error);
+            }
+          }}
+        />
+      </div>
+      <UploadCSV onUploadSuccess={() => setLastUploadTime(Date.now())} />
 
       <div className='relative z-40 max-w-4xl mx-auto px-4 pb-12'>
         {/* Configuration Section */}
@@ -187,6 +227,7 @@ export const TransitionLab: React.FC = () => {
             <SongSelector
               selectedSongs={selectedSongs}
               onSongsChange={setSelectedSongs}
+              lastUploadTime={lastUploadTime}
             />
           </div>
 

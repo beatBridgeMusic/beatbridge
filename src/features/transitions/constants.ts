@@ -49,7 +49,7 @@ export const DURATION_OPTIONS = [
 ];
 
 // Maximum number of songs a user can select
-export const MAX_SONG_SELECTION = 20;
+export const MAX_SONG_SELECTION = 30;
 
 // Minimum number of songs needed to create a playlist
 export const MIN_SONG_SELECTION = 3;

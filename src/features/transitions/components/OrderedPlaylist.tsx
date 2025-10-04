@@ -128,7 +128,7 @@ export const OrderedPlaylist: React.FC<OrderedPlaylistProps> = ({ playlist, isGe
                 <h4 className="text-white font-semibold truncate group-hover:text-blue-400 transition-colors">
                   {song.track_name}
                 </h4>
-                <p className="text-white/70 text-sm truncate">{song.artist_name_s}</p>
+                <p className="text-white/70 text-sm truncate">{song.artist_names}</p>
                 <div className="flex flex-wrap gap-2 mt-1 text-xs text-white/50">
                   <span>{formatDuration(song.duration_ms)}</span>
                   <span>•</span>
