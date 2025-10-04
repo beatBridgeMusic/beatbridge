@@ -76,7 +76,7 @@ export default function PlaylistDropdown({ className, onSelect, initialPlaylistI
         if (!list || list.length === 0) {
           setSelectedId('');
           setStatus('empty');
-        //   onSelect?.(null);
+          //   onSelect?.(null);
           return;
         }
 
@@ -115,6 +115,7 @@ export default function PlaylistDropdown({ className, onSelect, initialPlaylistI
     setSelectedId(id);
     const p = sorted.find((pl) => pl.id === id) ?? null;
     onSelect?.(p);
+    console.log('handle change. selectedId:', id, 'p:', p);
   };
 
   return (

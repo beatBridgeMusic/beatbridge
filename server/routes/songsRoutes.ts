@@ -11,6 +11,10 @@ router.get('/playlists/:userId', songsController.getPlaylists, (req, res) => {
   res.status(200).json(res.locals.playlists);
 });
 
+router.get('/playlistTracks/:playlistId', songsController.getPlaylistTracks, (req, res) => {
+  res.status(200).json(res.locals.playlistTracks);
+});
+
 router.get('/demo', songsController.getDemoSongs, (req, res) => {
   res.status(200).json(res.locals.songsList);
 });

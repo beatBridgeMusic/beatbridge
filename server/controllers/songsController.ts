@@ -12,6 +12,7 @@ function extractTrackUris(rows: PlaylistRow[]): string[] {
 
 interface SongsController {
   getPlaylists(req: Request, res: Response, next: NextFunction): Promise<void>;
+  getPlaylistTracks(req: Request, res: Response, next: NextFunction): Promise<void>;
   uploadPlaylist(req: Request, res: Response, next: NextFunction): Promise<void>;
   getSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
   getDemoSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -265,7 +266,6 @@ const songsController: SongsController = {
     console.log('get playlists called');
     try {
       const userId = req.params.userId;
-      console.log('userId in getPlaylists:', userId);
       if (!userId) {
         return next({
           log: 'getPlaylists: missing userId',
@@ -291,11 +291,36 @@ const songsController: SongsController = {
         [userId]
       );
       res.locals.playlists = rows;
-      console.log('res.locals.playlists:', res.locals.playlists);
       return next();
     } catch (error) {
       return next({
         log: 'error in getPlaylists function',
+        status: 500,
+        message: { err: error.message },
+      });
+    }
+  },
+
+  async getPlaylistTracks(req, res, next) {
+    console.log('get playlist tracks called');
+    try {
+      const result = await db.query(
+        `SELECT
+        t.*,
+        pt.position AS playlist_position
+        FROM public.playlist_tracks AS pt
+        JOIN public.tracks AS t
+        ON t.track_uri = pt.track_uri
+        WHERE pt.playlist_id = $1::uuid
+        ORDER BY pt.position ASC;
+        `,
+        [req.params.playlistId]
+      );
+      res.locals.playlistTracks = result.rows;
+      return next();
+    } catch (error) {
+      return next({
+        log: 'error in getPlaylistTracks function',
         status: 500,
         message: { err: error.message },
       });
@@ -308,7 +333,6 @@ const songsController: SongsController = {
       const { sort, dir } = req.query;
       const result = await db.query(`SELECT track_name FROM groovin ORDER BY ${sort} ${dir}`);
       res.locals.songsList = result.rows;
-      console.log(res.locals.songsList);
       return next();
     } catch (error) {
       return next({
@@ -340,7 +364,6 @@ const songsController: SongsController = {
     try {
       const result = await db.query('SELECT track_names FROM groovin');
       res.locals.songsList = result.rows;
-      console.log(res.locals.songsList);
       return next();
     } catch (error) {
       return next({

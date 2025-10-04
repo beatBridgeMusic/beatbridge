@@ -13,20 +13,15 @@ import UploadCSV from '../../../components/UploadCSV';
 export const TransitionLab: React.FC = () => {
   // State management
   const [selectedSongs, setSelectedSongs] = useState<DbSong[]>([]);
-  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(
-    null
-  );
+  const [selectedMetric, setSelectedMetric] = useState<OrderingMetric | null>(null);
   const [orderDirection, setOrderDirection] = useState<'asc' | 'desc'>('asc');
   const [customDuration, setCustomDuration] = useState<number | null>(null);
-  const [orderedPlaylist, setOrderedPlaylist] =
-    useState<OrderedPlaylistType | null>(null);
+  const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
-  const canGenerate =
-    selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
+  const canGenerate = selectedSongs.length >= MIN_SONG_SELECTION && selectedMetric;
 
   const handleGeneratePlaylist = async () => {
     if (!canGenerate) return;
@@ -159,9 +154,7 @@ export const TransitionLab: React.FC = () => {
           <div></div> {/* Spacer for centering */}
           {user && (
             <div className='flex items-center gap-4 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20'>
-              <span className='text-sm'>
-                Hello, {user.username ?? user.email}
-              </span>
+              <span className='text-sm'>Hello, {user.username ?? user.email}</span>
               <button
                 onClick={handleLogout}
                 className='bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-full text-sm font-medium transition-colors'
@@ -172,9 +165,7 @@ export const TransitionLab: React.FC = () => {
           )}
         </div>
         <h1 className='text-4xl font-extrabold'>🎵 BeatBridge</h1>
-        <p className='text-lg font-light'>
-          Order your customized playlist by any metric for the perfect flow
-        </p>
+        <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
       </header>
 
       <UploadCSV></UploadCSV>
@@ -186,16 +177,11 @@ export const TransitionLab: React.FC = () => {
           <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
             <div className='flex items-center gap-4 mb-4'>
               <div className='bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                2
+                1
               </div>
-              <h2 className='text-xl font-semibold text-white'>
-                Choose Your Songs
-              </h2>
+              <h2 className='text-xl font-semibold text-white'>Choose Songs from a Playlist</h2>
             </div>
-            <SongSelector
-              selectedSongs={selectedSongs}
-              onSongsChange={setSelectedSongs}
-            />
+            <SongSelector selectedSongs={selectedSongs} onSongsChange={setSelectedSongs} />
           </div>
 
           {/* Step 2: Metric Selection */}
@@ -203,11 +189,9 @@ export const TransitionLab: React.FC = () => {
             <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
               <div className='flex items-center gap-4 mb-4'>
                 <div className='bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                  3
+                  2
                 </div>
-                <h2 className='text-xl font-semibold text-white'>
-                  Choose Your Flow
-                </h2>
+                <h2 className='text-xl font-semibold text-white'>Choose Your Flow Metric</h2>
               </div>
               <MetricSelector
                 selectedMetric={selectedMetric}
@@ -223,14 +207,10 @@ export const TransitionLab: React.FC = () => {
             <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
               <div className='flex items-center gap-4 mb-4'>
                 <div className='bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                  4
+                  3
                 </div>
-                <h2 className='text-xl font-semibold text-white'>
-                  Set Duration
-                </h2>
-                <span className='text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full'>
-                  (Optional)
-                </span>
+                <h2 className='text-xl font-semibold text-white'>Set Duration</h2>
+                <span className='text-sm text-white/70 bg-white/10 px-2 py-1 rounded-full'>(Optional)</span>
               </div>
               <DurationInput
                 selectedSongs={selectedSongs}
@@ -243,17 +223,13 @@ export const TransitionLab: React.FC = () => {
           {/* Generate Button */}
           {canGenerate && (
             <div className='bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-6 shadow-xl border border-white/30'>
-              <h3 className='text-2xl font-bold text-white mb-4 text-center'>
-                Ready to Create Your Beat Bridge!
-              </h3>
+              <h3 className='text-2xl font-bold text-white mb-4 text-center'>Ready to Create Your Beat Bridge!</h3>
               <button
                 onClick={handleGeneratePlaylist}
                 disabled={isGenerating}
                 className='w-full bg-white text-blue-600 py-4 px-8 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                {isGenerating
-                  ? 'Creating Your Beat Bridge...'
-                  : 'Create Beat Bridge'}
+                {isGenerating ? 'Creating Your Beat Bridge...' : 'Create Beat Bridge'}
               </button>
             </div>
           )}
@@ -261,11 +237,7 @@ export const TransitionLab: React.FC = () => {
 
         {/* Results Section */}
         <div className='mt-8'>
-          <OrderedPlaylist
-            playlist={orderedPlaylist}
-            isGenerating={isGenerating}
-            onCreateNew={handleCreateNew}
-          />
+          <OrderedPlaylist playlist={orderedPlaylist} isGenerating={isGenerating} onCreateNew={handleCreateNew} />
         </div>
       </div>
     </div>

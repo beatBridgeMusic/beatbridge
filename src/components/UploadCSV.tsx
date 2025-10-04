@@ -86,9 +86,9 @@ export default function UploadPlaylist() {
       <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
         <div className='flex items-center gap-4 mb-4'>
           <div className='bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-            1
+            0
           </div>
-          <h2 className='text-xl font-semibold text-white'>Upload a Playlist</h2>
+          <h2 className='text-xl font-semibold text-white'>Upload a New Playlist?</h2>
         </div>
 
         <div className='space-y-4'>
