@@ -185,8 +185,8 @@ export const TransitionLab: React.FC = () => {
           {/* Step 1: Song Selection */}
           <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
             <div className='flex items-center gap-4 mb-4'>
-              <div className='bg-blue-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                1
+              <div className='bg-yellow-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
+                2
               </div>
               <h2 className='text-xl font-semibold text-white'>
                 Choose Your Songs
@@ -203,7 +203,7 @@ export const TransitionLab: React.FC = () => {
             <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
               <div className='flex items-center gap-4 mb-4'>
                 <div className='bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                  2
+                  3
                 </div>
                 <h2 className='text-xl font-semibold text-white'>
                   Choose Your Flow
@@ -223,7 +223,7 @@ export const TransitionLab: React.FC = () => {
             <div className='bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 shadow-lg'>
               <div className='flex items-center gap-4 mb-4'>
                 <div className='bg-purple-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold'>
-                  3
+                  4
                 </div>
                 <h2 className='text-xl font-semibold text-white'>
                   Set Duration

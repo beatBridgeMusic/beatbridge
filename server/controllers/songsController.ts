@@ -11,9 +11,10 @@ function extractTrackUris(rows: PlaylistRow[]): string[] {
 }
 
 interface SongsController {
+  getPlaylists(req: Request, res: Response, next: NextFunction): Promise<void>;
   uploadPlaylist(req: Request, res: Response, next: NextFunction): Promise<void>;
   getSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
-  getAllSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
+  getDemoSongs(req: Request, res: Response, next: NextFunction): Promise<void>;
   getAllTrackNames(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
@@ -80,6 +81,13 @@ const SORTABLE_METRICS: SortableMetrics = {
 
 const songsController: SongsController = {
   // TODO: should probablt split this up into uploadTracks, createPlaylist, linkTracksToPlaylist
+  // TODO: use the JWT (session token) from supabase that already gets fed into upload playlist
+  // Add a tiny auth middleware that
+  // 1. reads the Authorization header
+  // 2. extracts the bearer token
+  // 3. asks Supabase to tell you which user it belongs to,
+  // 4. puts that user on req.user.
+  // And then use req.user.id in your controllers instead of trusting req.body.userId
   async uploadPlaylist(req, res, next) {
     try {
       const { playlistName, rows, userId } = req.body;
@@ -253,6 +261,47 @@ const songsController: SongsController = {
     }
   },
 
+  async getPlaylists(req, res, next) {
+    console.log('get playlists called');
+    try {
+      const userId = req.params.userId;
+      console.log('userId in getPlaylists:', userId);
+      if (!userId) {
+        return next({
+          log: 'getPlaylists: missing userId',
+          status: 400,
+          message: { err: 'Missing userId parameter' },
+        });
+      }
+
+      const { rows } = await db.query(
+        `
+      SELECT
+        p.id,
+        p.name,
+        p.created_at,
+        COALESCE(COUNT(pt.track_uri), 0)::int AS track_count
+      FROM public.playlists AS p
+      LEFT JOIN public.playlist_tracks AS pt
+        ON pt.playlist_id = p.id
+      WHERE p.user_id = $1
+      GROUP BY p.id
+      ORDER BY COALESCE(p.created_at) DESC, p.name ASC;
+      `,
+        [userId]
+      );
+      res.locals.playlists = rows;
+      console.log('res.locals.playlists:', res.locals.playlists);
+      return next();
+    } catch (error) {
+      return next({
+        log: 'error in getPlaylists function',
+        status: 500,
+        message: { err: error.message },
+      });
+    }
+  },
+
   async getSongs(req, res, next) {
     console.log('get songs called');
     try {
@@ -270,8 +319,8 @@ const songsController: SongsController = {
     }
   },
 
-  async getAllSongs(req, res, next) {
-    console.log('get all songs called');
+  async getDemoSongs(req, res, next) {
+    console.log('get demo songs called');
     try {
       const result = await db.query('SELECT * FROM groovin');
       res.locals.songsList = result.rows;

@@ -2,33 +2,41 @@
 import React, { useState, useEffect } from 'react';
 import type { DbSong } from '../types';
 import { MAX_SONG_SELECTION, MIN_SONG_SELECTION } from '../constants';
+import PlaylistDropdown from '../../../components/PlaylistDropdown';
+import { useAuth } from '../../../AuthContext';
+
+type PlaylistSummary = {
+  id: string;
+  name: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+  track_count?: number | null;
+};
 
 interface SongSelectorProps {
   selectedSongs: DbSong[];
   onSongsChange: (songs: DbSong[]) => void;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({
-  selectedSongs,
-  onSongsChange,
-}) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
   const [sortBy, setSortBy] = useState<'artist' | 'title'>('artist');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, token } = useAuth();
 
-  // Mock data - will be replaced with API call
+  const [selected, setSelected] = useState<PlaylistSummary | null>(null);
+
+  // TODO: stretch feature: refresh playlist dropdown on CSV upload. not sure whether to do it here or in UploadCSV
   useEffect(() => {
     const fetchSongs = async () => {
       setIsLoading(true);
       try {
         // TODO: Replace with better API call? or maybe it's too much work to refactor the frontend
-        const response = await fetch('http://localhost:3001/songs/all');
+        const response = await fetch('http://localhost:3001/songs/demo');
         if (!response.ok) {
-          throw new Error(
-            `Error fetching all songs, server returned ${response.status}`
-          );
+          throw new Error(`Error fetching all songs, server returned ${response.status}`);
         }
         const data = await response.json();
 
@@ -86,11 +94,29 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
   }
 
   return (
-    <div className="song-selector">
+    <div className='song-selector'>
+      <div className='w-full max-w-3xl mx-auto px-4 py-6'>
+        <PlaylistDropdown
+          className='mb-4'
+          token={token} // pass only if your backend needs it
+          userId={user.id}
+          onSelect={(p) => setSelected(p)}
+        />
+
+        {selected ? (
+          <p className='text-white'>
+            Selected: <span className='font-medium'>{selected.name}</span>
+          </p>
+        ) : (
+          <p className='text-white/70'>Pick a playlist to continue.</p>
+        )}
+      </div>
       {/* ✅ REMOVED: <h3>Choose Your Songs</h3> - now handled by step card header */}
       {/* 🟢 CHANGED: Added step-description class, removed duplicate heading */}
-      <p className="step-description">Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database</p>
-      
+      <p className='step-description'>
+        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from our database
+      </p>
+
       {/* Selected Songs Display */}
       {selectedSongs.length > 0 && (
         <div className='selected-songs'>
@@ -103,10 +129,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
                 <span className='song-info'>
                   {song.track_name} - {song.artist_name_s}
                 </span>
-                <button
-                  onClick={() => handleRemoveSelectedSong(song.id)}
-                  className='remove-song-btn'
-                >
+                <button onClick={() => handleRemoveSelectedSong(song.id)} className='remove-song-btn'>
                   ✕
                 </button>
               </div>
@@ -117,10 +140,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
 
       {/* Song Selection Dropdown */}
       <div className='song-dropdown'>
-        <button
-          className='dropdown-toggle'
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
+        <button className='dropdown-toggle' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
           Add Songs ({filteredAndSortedSongs.length} available)
           <span className={`arrow ${isDropdownOpen ? 'up' : 'down'}`}>▼</span>
         </button>
@@ -138,9 +158,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
               />
               <select
                 value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as 'artist' | 'title')
-                }
+                onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
                 className='sort-select'
               >
                 <option value='artist'>Sort by Artist</option>
@@ -152,15 +170,12 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
             <div className='songs-list'>
               {filteredAndSortedSongs.map((song) => {
                 const isSelected = selectedSongs.some((s) => s.id === song.id);
-                const isDisabled =
-                  !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
+                const isDisabled = !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
 
                 return (
                   <div
                     key={song.id}
-                    className={`song-item ${isSelected ? 'selected' : ''} ${
-                      isDisabled ? 'disabled' : ''
-                    }`}
+                    className={`song-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
                   >
                     <label className='song-checkbox'>
                       <input
@@ -182,9 +197,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({
               })}
 
               {filteredAndSortedSongs.length === 0 && (
-                <div className='no-results'>
-                  No songs found matching your search
-                </div>
+                <div className='no-results'>No songs found matching your search</div>
               )}
             </div>
           </div>
