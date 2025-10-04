@@ -24,23 +24,25 @@ describe('OrderedPlaylist', () => {
   describe('Loading State', () => {
     it('shows generating message when isGenerating is true', () => {
       render(
-        <OrderedPlaylist 
-          playlist={null} 
-          isGenerating={true} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={null}
+          isGenerating={true}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
-      expect(screen.getByText(/creating your beat bridge/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/creating your beat bridge/i)
+      ).toBeInTheDocument();
       expect(screen.getByText(/analyzing your songs/i)).toBeInTheDocument();
     });
 
     it('displays animated loading bars', () => {
       const { container } = render(
-        <OrderedPlaylist 
-          playlist={null} 
-          isGenerating={true} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={null}
+          isGenerating={true}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -52,23 +54,27 @@ describe('OrderedPlaylist', () => {
   describe('Empty State', () => {
     it('shows empty state message when no playlist', () => {
       render(
-        <OrderedPlaylist 
-          playlist={null} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={null}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
-      expect(screen.getByText(/your beat bridge will appear here/i)).toBeInTheDocument();
-      expect(screen.getByText(/select songs, choose a metric/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/your beat bridge will appear here/i)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/select songs, choose a metric/i)
+      ).toBeInTheDocument();
     });
 
     it('does not show playlist when null', () => {
       render(
-        <OrderedPlaylist 
-          playlist={null} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={null}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -80,10 +86,10 @@ describe('OrderedPlaylist', () => {
   describe('Playlist Header', () => {
     it('displays playlist title', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -92,10 +98,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows correct song count', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -104,10 +110,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows total duration', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -116,10 +122,10 @@ describe('OrderedPlaylist', () => {
 
     it('displays ordering metric label', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -127,12 +133,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('shows correct metric label for tempo', () => {
-      const tempoPlaylist = { ...mockPlaylist, orderingMetric: 'tempo' as const };
+      const tempoPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'tempo' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={tempoPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={tempoPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -143,10 +152,10 @@ describe('OrderedPlaylist', () => {
   describe('Song List Rendering', () => {
     it('renders all songs in the playlist', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -158,10 +167,10 @@ describe('OrderedPlaylist', () => {
 
     it('displays song numbers correctly', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -173,10 +182,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows artist names', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -186,10 +195,10 @@ describe('OrderedPlaylist', () => {
 
     it('displays song durations', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -199,10 +208,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows genres for each song', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -212,10 +221,10 @@ describe('OrderedPlaylist', () => {
 
     it('displays explicit badge for explicit songs', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -226,16 +235,16 @@ describe('OrderedPlaylist', () => {
 
     it('shows flow arrows between songs', () => {
       const { container } = render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
       // Should have 3 arrows for 4 songs (no arrow after last song)
       const arrows = Array.from(container.querySelectorAll('div')).filter(
-        el => el.textContent === '↓'
+        (el) => el.textContent === '↓'
       );
       expect(arrows.length).toBe(3);
     });
@@ -243,12 +252,15 @@ describe('OrderedPlaylist', () => {
 
   describe('Metric Value Display', () => {
     it('formats tempo values correctly', () => {
-      const tempoPlaylist = { ...mockPlaylist, orderingMetric: 'tempo' as const };
+      const tempoPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'tempo' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={tempoPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={tempoPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -257,12 +269,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('formats energy values as percentages', () => {
-      const energyPlaylist = { ...mockPlaylist, orderingMetric: 'energy' as const };
+      const energyPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'energy' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={energyPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={energyPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -271,12 +286,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('formats valence values as percentages', () => {
-      const valencePlaylist = { ...mockPlaylist, orderingMetric: 'valence' as const };
+      const valencePlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'valence' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={valencePlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={valencePlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -285,12 +303,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('formats danceability values as percentages', () => {
-      const dancePlaylist = { ...mockPlaylist, orderingMetric: 'danceability' as const };
+      const dancePlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'danceability' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={dancePlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={dancePlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -299,12 +320,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('formats loudness values with decimal', () => {
-      const loudnessPlaylist = { ...mockPlaylist, orderingMetric: 'loudness' as const };
+      const loudnessPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'loudness' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={loudnessPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={loudnessPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -313,12 +337,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('formats popularity values correctly', () => {
-      const popPlaylist = { ...mockPlaylist, orderingMetric: 'popularity' as const };
+      const popPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'popularity' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={popPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={popPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -330,23 +357,25 @@ describe('OrderedPlaylist', () => {
   describe('Action Buttons', () => {
     it('renders create another button', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
-      expect(screen.getByText(/create another beat bridge/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/create another beat bridge/i)
+      ).toBeInTheDocument();
     });
 
     it('calls onCreateNew when create another is clicked', async () => {
       const user = userEvent.setup();
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -357,10 +386,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows disabled export button', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -370,10 +399,10 @@ describe('OrderedPlaylist', () => {
 
     it('shows disabled share button', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -383,24 +412,26 @@ describe('OrderedPlaylist', () => {
 
     it('displays coming soon message', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
-      expect(screen.getByText(/export and share features coming soon/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/export and share features coming soon/i)
+      ).toBeInTheDocument();
     });
   });
 
   describe('Flow Analysis', () => {
     it('displays flow analysis section', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -408,12 +439,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('calculates and displays average energy correctly', () => {
-      const energyPlaylist = { ...mockPlaylist, orderingMetric: 'energy' as const };
+      const energyPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'energy' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={energyPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={energyPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -423,12 +457,15 @@ describe('OrderedPlaylist', () => {
     });
 
     it('calculates average tempo correctly', () => {
-      const tempoPlaylist = { ...mockPlaylist, orderingMetric: 'tempo' as const };
+      const tempoPlaylist = {
+        ...mockPlaylist,
+        orderingMetric: 'tempo' as const,
+      };
       render(
-        <OrderedPlaylist 
-          playlist={tempoPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={tempoPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -442,12 +479,12 @@ describe('OrderedPlaylist', () => {
         ...mockPlaylist,
         songs: [mockSongs[2], mockSongs[1], mockSongs[0], mockSongs[3]], // 0.3, 0.6, 0.9, 0.95
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={ascendingPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={ascendingPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -460,12 +497,12 @@ describe('OrderedPlaylist', () => {
         ...mockPlaylist,
         songs: [mockSongs[3], mockSongs[0], mockSongs[1], mockSongs[2]], // 0.95, 0.9, 0.6, 0.3
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={descendingPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={descendingPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -477,12 +514,12 @@ describe('OrderedPlaylist', () => {
         ...mockPlaylist,
         songs: [mockSongs[0]],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={singleSongPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={singleSongPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -491,10 +528,10 @@ describe('OrderedPlaylist', () => {
 
     it('displays unique genres', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -513,12 +550,12 @@ describe('OrderedPlaylist', () => {
           { ...mockSongs[3], genres: 'electronic' },
         ],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={manyGenresPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={manyGenresPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -535,12 +572,12 @@ describe('OrderedPlaylist', () => {
           { ...mockSongs[2], genres: 'pop' }, // duplicate
         ],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={fewGenresPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={fewGenresPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -557,12 +594,12 @@ describe('OrderedPlaylist', () => {
         ...mockPlaylist,
         songs: [],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={emptyPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={emptyPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -572,17 +609,19 @@ describe('OrderedPlaylist', () => {
     it('formats duration with leading zero for seconds', () => {
       const shortSongPlaylist = {
         ...mockPlaylist,
-        songs: [{
-          ...mockSongs[0],
-          duration_ms: 125000, // 2 minutes 5 seconds
-        }],
+        songs: [
+          {
+            ...mockSongs[0],
+            duration_ms: 125000, // 2 minutes 5 seconds
+          },
+        ],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={shortSongPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={shortSongPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -594,12 +633,12 @@ describe('OrderedPlaylist', () => {
         ...mockPlaylist,
         songs: [{ ...mockSongs[0], explicit: false }],
       };
-      
+
       render(
-        <OrderedPlaylist 
-          playlist={cleanPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={cleanPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -611,10 +650,10 @@ describe('OrderedPlaylist', () => {
   describe('Accessibility', () => {
     it('uses semantic heading levels', () => {
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
@@ -625,18 +664,18 @@ describe('OrderedPlaylist', () => {
     it('buttons are keyboard accessible', async () => {
       const user = userEvent.setup();
       render(
-        <OrderedPlaylist 
-          playlist={mockPlaylist} 
-          isGenerating={false} 
-          onCreateNew={mockOnCreateNew} 
+        <OrderedPlaylist
+          playlist={mockPlaylist}
+          isGenerating={false}
+          onCreateNew={mockOnCreateNew}
         />
       );
 
       const createButton = screen.getByText(/create another beat bridge/i);
       createButton.focus();
-      
+
       expect(createButton).toHaveFocus();
-      
+
       await user.keyboard('{Enter}');
       expect(mockOnCreateNew).toHaveBeenCalled();
     });
