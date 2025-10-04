@@ -18,7 +18,10 @@ interface SongSelectorProps {
   onSongsChange: (songs: DbSong[]) => void;
 }
 
-export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSongsChange }) => {
+export const SongSelector: React.FC<SongSelectorProps> = ({
+  selectedSongs,
+  onSongsChange,
+}) => {
   const [availableSongs, setAvailableSongs] = useState<DbSong[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFilter, setSearchFilter] = useState('');
@@ -29,7 +32,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
   // Playlist dropdown state
   const [playlists, setPlaylists] = useState<PlaylistSummary[]>([]);
   const [selectedId, setSelectedId] = useState('');
-  const [dropdownStatus, setDropdownStatus] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle');
+  const [dropdownStatus, setDropdownStatus] = useState<
+    'idle' | 'loading' | 'ready' | 'empty' | 'error'
+  >('idle');
   const [dropdownError, setDropdownError] = useState('');
 
   // Sort playlists by most recent
@@ -51,12 +56,15 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
       setDropdownStatus('loading');
       setDropdownError('');
       try {
-        const resp = await fetch(`http://localhost:3001/songs/playlists/${user.id}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
+        const resp = await fetch(
+          `http://localhost:3001/songs/playlists/${user.id}`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          }
+        );
 
         if (!resp.ok) {
           let msg = `HTTP ${resp.status}`;
@@ -94,7 +102,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
         setDropdownStatus('ready');
       } catch (error) {
         if (cancelled) return;
-        setDropdownError(error instanceof Error ? error.message : 'Failed to load playlists');
+        setDropdownError(
+          error instanceof Error ? error.message : 'Failed to load playlists'
+        );
         setDropdownStatus('error');
       }
     };
@@ -115,14 +125,19 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
           return;
         }
 
-        const response = await fetch(`http://localhost:3001/songs/playlistTracks/${selectedId}`, {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-        });
+        const response = await fetch(
+          `http://localhost:3001/songs/playlistTracks/${selectedId}`,
+          {
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          }
+        );
 
         if (!response.ok) {
-          throw new Error(`Error fetching playlist songs, server returned ${response.status}`);
+          throw new Error(
+            `Error fetching playlist songs, server returned ${response.status}`
+          );
         }
         const data = await response.json();
 
@@ -150,7 +165,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
         const artistName = song.artist_name_s?.toLowerCase() ?? '';
         const searchTerm = searchFilter.toLowerCase();
 
-        return trackName.includes(searchTerm) || artistName.includes(searchTerm);
+        return (
+          trackName.includes(searchTerm) || artistName.includes(searchTerm)
+        );
       })
       .sort((a, b) => {
         if (sortBy === 'artist') {
@@ -169,11 +186,15 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
   const handleSongToggle = (song: DbSong) => {
     selectedSongs.map((s) => ({ uri: s.track_uri, name: s.track_name }));
 
-    const isSelected = selectedSongs.some((s) => s.track_uri === song.track_uri);
+    const isSelected = selectedSongs.some(
+      (s) => s.track_uri === song.track_uri
+    );
 
     if (isSelected) {
       // Remove song
-      onSongsChange(selectedSongs.filter((s) => s.track_uri !== song.track_uri));
+      onSongsChange(
+        selectedSongs.filter((s) => s.track_uri !== song.track_uri)
+      );
     } else {
       // Add song (if under limit)
       if (selectedSongs.length < MAX_SONG_SELECTION) {
@@ -200,7 +221,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     <div className='song-selector'>
       <div className='w-full max-w-3xl mx-auto px-4 py-6'>
         <div className='mb-4'>
-          <label className='block mb-2 text-sm text-white'>Select a playlist</label>
+          <label className='block mb-2 text-sm text-white'>
+            Select a playlist
+          </label>
 
           <div className='flex items-center gap-2'>
             <select
@@ -214,31 +237,54 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
                 //   console.log('Selected playlist:', selectedPlaylist);
                 // }
               }}
-              disabled={dropdownStatus === 'loading' || dropdownStatus === 'empty' || dropdownStatus === 'error'}
+              disabled={
+                dropdownStatus === 'loading' ||
+                dropdownStatus === 'empty' ||
+                dropdownStatus === 'error'
+              }
               className='w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white disabled:opacity-50'
             >
-              {dropdownStatus === 'loading' && <option value=''>Loading your playlists…</option>}
-              {dropdownStatus === 'empty' && <option value=''>No playlists yet — upload a CSV to begin</option>}
-              {dropdownStatus === 'error' && <option value=''>Couldn't load playlists</option>}
+              {dropdownStatus === 'loading' && (
+                <option value=''>Loading your playlists…</option>
+              )}
+              {dropdownStatus === 'empty' && (
+                <option value=''>
+                  No playlists yet — upload a CSV to begin
+                </option>
+              )}
+              {dropdownStatus === 'error' && (
+                <option value=''>Couldn't load playlists</option>
+              )}
               {dropdownStatus === 'ready' &&
                 sortedPlaylists.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
-                    {typeof p.track_count === 'number' ? ` (${p.track_count} tracks)` : ''}
+                    {typeof p.track_count === 'number'
+                      ? ` (${p.track_count} tracks)`
+                      : ''}
                   </option>
                 ))}
             </select>
 
-            {dropdownStatus === 'loading' && <span className='text-xs text-white/70'>Loading…</span>}
-            {dropdownStatus === 'error' && <span className='text-xs text-red-300'>Error</span>}
+            {dropdownStatus === 'loading' && (
+              <span className='text-xs text-white/70'>Loading…</span>
+            )}
+            {dropdownStatus === 'error' && (
+              <span className='text-xs text-red-300'>Error</span>
+            )}
           </div>
 
-          {dropdownError && <p className='mt-2 text-xs text-red-300'>{dropdownError}</p>}
+          {dropdownError && (
+            <p className='mt-2 text-xs text-red-300'>{dropdownError}</p>
+          )}
         </div>
 
         {selectedId ? (
           <p className='text-white'>
-            Selected: <span className='font-medium'>{sortedPlaylists.find((p) => p.id === selectedId)?.name}</span>
+            Selected:{' '}
+            <span className='font-medium'>
+              {sortedPlaylists.find((p) => p.id === selectedId)?.name}
+            </span>
           </p>
         ) : (
           <p className='text-white/70'>Pick a playlist to continue.</p>
@@ -247,7 +293,8 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
       {/* ✅ REMOVED: <h3>Choose Your Songs</h3> - now handled by step card header */}
       {/* 🟢 CHANGED: Added step-description class, removed duplicate heading */}
       <p className='step-description'>
-        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from your playlist
+        Select {MIN_SONG_SELECTION}-{MAX_SONG_SELECTION} songs from your
+        playlist
       </p>
 
       {/* Selected Songs Display */}
@@ -262,7 +309,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
                 <span className='song-info'>
                   {song.track_name} - {song.artist_name_s}
                 </span>
-                <button onClick={() => handleRemoveSelectedSong(song.track_uri)} className='remove-song-btn'>
+                <button
+                  onClick={() => handleRemoveSelectedSong(song.track_uri)}
+                  className='remove-song-btn'
+                >
                   ✕
                 </button>
               </div>
@@ -273,7 +323,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
 
       {/* Song Selection Dropdown */}
       <div className='song-dropdown'>
-        <button className='dropdown-toggle' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+        <button
+          className='dropdown-toggle'
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
           Add Songs ({filteredAndSortedSongs.length} available)
           <span className={`arrow ${isDropdownOpen ? 'up' : 'down'}`}>▼</span>
         </button>
@@ -291,7 +344,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'artist' | 'title')}
+                onChange={(e) =>
+                  setSortBy(e.target.value as 'artist' | 'title')
+                }
                 className='sort-select'
               >
                 <option value='artist'>Sort by Artist</option>
@@ -302,20 +357,26 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
             {/* Songs List */}
             <div className='songs-list'>
               {filteredAndSortedSongs.map((song) => {
-                const isSelected = selectedSongs.some((s) => s.track_uri === song.track_uri);
-                const isDisabled = !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
+                const isSelected = selectedSongs.some(
+                  (s) => s.track_uri === song.track_uri
+                );
+                const isDisabled =
+                  !isSelected && selectedSongs.length >= MAX_SONG_SELECTION;
 
                 return (
                   <div
                     key={song.track_uri}
-                    className={`song-item ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                    className={`song-item ${isSelected ? 'selected' : ''} ${
+                      isDisabled ? 'disabled' : ''
+                    }`}
                   >
-                    <label className='song-checkbox'>
+                    <label className='song-checkbox flex items-center gap-3 py-3 cursor-pointer hover:bg-white/5 rounded-md transition'>
                       <input
                         type='checkbox'
                         checked={isSelected}
                         onChange={() => handleSongToggle(song)}
                         disabled={isDisabled}
+                        className='w-5 h-5 accent-blue-500 cursor-pointer shrink-0 mt-[2px]'
                       />
                       <div className='song-details'>
                         <div className='song-title'>{song.track_name}</div>
@@ -330,7 +391,9 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
               })}
 
               {filteredAndSortedSongs.length === 0 && (
-                <div className='no-results'>No songs found matching your search</div>
+                <div className='no-results'>
+                  No songs found matching your search
+                </div>
               )}
             </div>
           </div>

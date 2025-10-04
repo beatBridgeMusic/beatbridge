@@ -201,6 +201,7 @@ export const TransitionLab: React.FC = () => {
                   Choose Your Flow Metric
                 </h2>
               </div>
+
               <MetricSelector
                 selectedMetric={selectedMetric}
                 onMetricChange={setSelectedMetric}
