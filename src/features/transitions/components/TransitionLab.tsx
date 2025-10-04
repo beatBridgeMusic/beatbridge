@@ -20,7 +20,7 @@ export const TransitionLab: React.FC = () => {
   const [orderedPlaylist, setOrderedPlaylist] = useState<OrderedPlaylistType | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [lastUploadTime, setLastUploadTime] = useState<number>(Date.now());
-  const [playerUris, setPlayerUris] = useState<string[]>(['spotify:track:3cLqK3LPVrTIzfENVmYLoU']);
+  const [playerUris, setPlayerUris] = useState<string[]>([]);
 
   const { user, logout } = useAuth();
   // Check if we can generate a playlist
@@ -170,8 +170,17 @@ export const TransitionLab: React.FC = () => {
             </div>
           )}
         </div>
-        <h1 className='text-4xl font-extrabold'>🎵 BeatBridge 🎵</h1>
-        <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
+        <div className="flex flex-col items-center gap-4">
+          <img 
+            src="/beatbridge_gradient.png" 
+            alt="BeatBridge Logo" 
+            className="w-50 h-50 object-contain"
+          />
+          <h1 className='text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-orange-600 text-transparent bg-clip-text'>
+            🎵 BeatBridge 🎵
+          </h1>
+          <p className='text-lg font-light'>Order your customized playlist by any metric for the perfect flow</p>
+        </div>
       </header>
 
       <div className='mt-4 mb-4'>
@@ -186,7 +195,7 @@ export const TransitionLab: React.FC = () => {
             trackNameColor: '#fff',
             height: 80,
           }}
-          token='BQBs3ySx4GdTA2cDnatdHJWcsY01b_hq9scVzar8T_scrCe6Wbc3b8rtJoHIQph9ThppmRuctH2ECwYN958UDzuWGmQXAhcjNoUocH1KnTJm4s_8McASFrOavopPnF-5PIoMSCrT7Flme_E0YZgIMxmuUw85ezkV7GULi5XDg2dBUJ34_2BNuRNowqlnqOPHqXSDqlZQyFO_ErD2Pss3LlNJFvQFfoAaOOiXzR8YCCijgPeg'
+          token='BQAV_CtBTXtwQuBxNkgH8SIse_Du0ipduItydlPgBZdSWThAKtkz4FoMkuiDJqwrEPzU-GfAiBb8CWcUP17nzEnrbzquJJKbLMesnKx2MpblAJPP8qSoVs8PLLhECTBqo8MRT0hM4Vtuxhnk98S0B9KIChIxGueXBTQGOZU0RpvtQ_BBed3gdA7bLws0n2A6zgH8OzA7TK3DY52edTp3hyaK51uluDHdTrD5Jsf48RHftfUf'
           name='BeatBridge Web Player'
           autoPlay={false}
           play={true}
