@@ -97,7 +97,18 @@ export default function UploadPlaylist({ onUploadSuccess }: Props) {
           <h2 className='text-xl font-semibold text-white'>Upload a New Playlist?</h2>
         </div>
 
-        <div className='space-y-4'>
+        <label className='block'>
+          <span className='block text-sm text-white mb-1'>CSV file (get at exportify.net)</span>
+          <input
+            key={fileInputKey}
+            type='file'
+            accept='.csv,text/csv'
+            onChange={handleFile}
+            className='w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20'
+          />
+        </label>
+
+        <div className='space-y-4 mt-6'>
           <label className='block'>
             <span className='block text-sm text-white mb-1'>Playlist name</span>
             <input
@@ -106,17 +117,6 @@ export default function UploadPlaylist({ onUploadSuccess }: Props) {
               placeholder='My Mix'
               value={playlistName}
               onChange={(e) => setPlaylistName(e.target.value)}
-            />
-          </label>
-
-          <label className='block'>
-            <span className='block text-sm text-white mb-1'>CSV file</span>
-            <input
-              key={fileInputKey}
-              type='file'
-              accept='.csv,text/csv'
-              onChange={handleFile}
-              className='w-full text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/10 file:text-white hover:file:bg-white/20'
             />
           </label>
 

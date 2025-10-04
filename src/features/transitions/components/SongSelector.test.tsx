@@ -341,7 +341,7 @@ describe('SongSelector', () => {
     ...mockSongs[0],
     id: `song-${i}`,
     track_name: `Song ${i}`,
-    artist_name_s: 'Artist',
+    artist_names: 'Artist',
     genres: 'pop',
   }));
 

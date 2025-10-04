@@ -82,13 +82,15 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
           return;
         }
 
-        // Auto-select most recent playlist if no selectedId or if lastUploadTime changed
+        // Get the most recent playlist ID
+        const mostRecentId = [...list].sort((a, b) => {
+          const at = Date.parse(a.updated_at || a.created_at || '') || 0;
+          const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
+          return bt - at;
+        })[0].id;
+
+        // Auto-select on first load or after a new upload
         if (!selectedId || lastUploadTime) {
-          const mostRecentId = [...list].sort((a, b) => {
-            const at = Date.parse(a.updated_at || a.created_at || '') || 0;
-            const bt = Date.parse(b.updated_at || b.created_at || '') || 0;
-            return bt - at;
-          })[0].id;
           setSelectedId(mostRecentId);
         }
 
@@ -104,7 +106,7 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
     return () => {
       cancelled = true;
     };
-  }, [user?.id, token, selectedId, lastUploadTime]);
+  }, [user?.id, token, lastUploadTime]); // Include lastUploadTime to trigger refresh on new uploads
 
   // Fetch songs when playlist selection changes
   useEffect(() => {
@@ -140,9 +142,10 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
   }, [selectedId, token]);
 
   const filteredAndSortedSongs = availableSongs
-    .filter(song => 
-      song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
-      song.artist_names.toLowerCase().includes(searchFilter.toLowerCase())
+    .filter(
+      (song) =>
+        song.track_name.toLowerCase().includes(searchFilter.toLowerCase()) ||
+        song.artist_names.toLowerCase().includes(searchFilter.toLowerCase())
     )
     .sort((a, b) => {
       if (sortBy === 'artist') {
@@ -304,9 +307,8 @@ export const SongSelector: React.FC<SongSelectorProps> = ({ selectedSongs, onSon
                       />
                       <div className='song-details'>
                         <div className='song-title-and-artist'>
-                          {song.track_name} • {song.artist_name_s}
+                          {song.track_name} • {song.artist_names}
                         </div>
-                        <div className='song-artist'>{song.artist_name_s}</div>
                         <div className='song-meta'>
                           {formatDuration(song.duration_ms)} • {song.genres}
                         </div>
